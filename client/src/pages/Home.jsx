@@ -1,13 +1,18 @@
-import { Button } from "@/components/ui/button";
+import React from 'react'
+import Header from '../Components/Header'
+import SpecialtyMenu from '../Components/SpecialtyMenu'
+import Topdoctors from '../Components/Topdoctors'
+import Banner from '../Components/Banner'
 
-function Home() {
-    return (
-      <div className="p-5 text-center text-2xl grid place-items-center mx-auto justify-center w-full h-full">
-        Welcome to Docushed
-        <Button>Submit</Button>
-      </div>
-    );
-  }
-  
-  export default Home;
-  
+const Home = () => {
+  return (
+    <div>
+     <Header/>
+     <SpecialtyMenu/>
+     <Topdoctors/>
+     <Banner/>
+    </div>
+  )
+}
+
+export default Home
