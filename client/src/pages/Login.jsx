@@ -101,7 +101,7 @@ const Login = () => {
 
   return (
     <form className="min-h-screen flex items-center justify-center bg-gradient-to-br ">
-      <div className="flex flex-col gap-6 p-8 min-w-[340px] sm:min-w-[400px] bg-white rounded-xl shadow-lg border-1 border-2 border-black">
+      <div className="flex flex-col gap-6 p-8 min-w-[340px] sm:min-w-[400px] bg-white rounded-xl shadow-lg border-1 border-black">
         <p className="text-2xl font-semibold text-center text-gray-800">
           {state === 'Sign up' ? 'Create Account' : 'Login'}
         </p>
