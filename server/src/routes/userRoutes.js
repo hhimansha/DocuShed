@@ -1,6 +1,6 @@
 import express from "express";
 
-import { allDoctors, checktoken, getUserData, login, logout, register, resetpassword, sendResetOtp, updateProfile, userRestPassword, verifyResetOtp } from "../controllers/userController.js";
+import { allDoctors, checktoken, getUserData, login, logout, register, resetpassword, sendResetOtp, updateProfile, userRestPassword, verifyResetOtp, deleteUserAccount } from "../controllers/userController.js";
 // import { getUsers } from "../controllers/userController";
 import userAuth from "../Middleware/userAutj.js";
 import upload from "../Middleware/multer.js";
