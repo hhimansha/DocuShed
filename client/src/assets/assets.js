@@ -62,10 +62,14 @@ export const assets = {
     stripe_logo,
     razorpay_logo,
     mail_icon,
+<<<<<<< HEAD
     lock_icon,
     upload_area,
     upload,delete1,
     patient
+=======
+    lock_icon
+>>>>>>> cc70d22 (comit)
 
 }
 
