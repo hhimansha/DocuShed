@@ -59,7 +59,8 @@ const Appointment = () => {
           <img className="w-5 h-5" src={assets.info_icon} alt="Info" />
         </p>
         <p className="text-gray-600 mt-2 leading-relaxed">{docInfo.about}</p>
-        <p className="text-gray-600 mt-2 leading-relaxed">Appointment fees:<span>{currencysymbol}{docInfo.fees}</span></p>
+        <p className="text-gray-600 mt-2 leading-relaxed">Appointment fees:<span className='bg-amber-300 font-bold'>{currencysymbol}{docInfo.fees}</span></p>  <br />
+         <button className="bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block">Get Appointment</button> <br />
       </div>
         </div>
       </div>
