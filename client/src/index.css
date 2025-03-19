@@ -119,3 +119,30 @@
     @apply bg-background text-foreground;
   }
 }
+
+
+:root {
+  --color-primary: #5f6FFF;
+ 
+  
+ 
+}
+
+.grid-cols-auto {
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+}
+
+
+.bg-primary {
+  background-color: var(--color-primary); /* ✅ Use it here */
+}
+
+.active hr {
+  @apply block; /* ✅ Correct usage inside a selector */
+}
+
+::-webkit-scrollbar {
+  display: none; /* ✅ Use this instead of @apply hidden */
+}
+
+
