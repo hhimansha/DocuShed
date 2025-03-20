@@ -1,21 +1,81 @@
-import React, { useState } from 'react';
-import { assets } from '../assets/assets';
-import { Form } from 'react-router-dom';
+import React, { useContext, useState } from 'react';
+import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
+import { AppContext } from '@/Context/AppContext';
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
+  const { backendUrl,setIslogin } = useContext(AppContext);
+  const navigate = useNavigate();
+
   const [state, setState] = useState('Login');
   const [Email, setEmail] = useState('');
   const [Name, setName] = useState('');
   const [Password, setPassword] = useState('');
 
+
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    // Handle form submission here                                                  
-  };
+    //axios.defaults.withCredentials=true 
+  
+    try {
+      if (state === 'Login') {
+        const { data } = await axios.post('http://localhost:5000/api/auth/login', {
+          email: Email,
+          password: Password
+      }, {
+          withCredentials: true // This tells axios to send cookies with the request
+      });
+      
+        console.log(data); // For debugging
+  
+        if (data.status === 'success') {
+          const isAdmin = data.isAdmin;
+          const isdoctor = data.isStaff;
+  
+          if (isAdmin) {
+            navigate('/admin');
+            setIslogin(true)
 
+            toast.success("Admin Login Success");
+          } else if (isdoctor) {
+            navigate('/doctor');
+            setIslogin(true)
+            toast.success("Doctor Login Success");
+          } else {
+            navigate('/');
+            setIslogin(true)
+            toast.success("Login Success");
+          }
+        } else {
+          toast.error(data.message || "Login failed!");
+        }
+      } else {
+        const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
+          name: Name,
+          email: Email,
+          password: Password
+        });
+  
+        console.log(data); // For debugging
+  
+        if (data.success === true) {
+          toast.success("Account Created! Please Login");
+          setState('Login');
+        }
+
+        
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || "Something went wrong!");
+    }
+  };
+  
+  
   return (
     <form className="min-h-screen flex items-center justify-center bg-gradient-to-br">
-      <div className="flex flex-col gap-6 p-8 min-w-[340px] sm:min-w-[400px] bg-white rounded-xl shadow-lg  border-1">
+      <div className="flex flex-col gap-6 p-8 min-w-[340px] sm:min-w-[400px] bg-white rounded-xl shadow-lg border-1">
         <p className="text-2xl font-semibold text-center text-gray-800">
           {state === 'Sign up' ? 'Create Account' : 'Login'}
         </p>
@@ -23,21 +83,19 @@ const Login = () => {
           Please {state === 'Sign up' ? 'Sign up' : 'Login'} to Book an appointment
         </p>
 
-        {/* Full Name Field */}
-         {state === 'Sign up' &&
-        <div className="w-full">
-          <p className="text-sm text-gray-700">Full Name</p>
-          <input
-            className="border border-gray-300 rounded w-full p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-400"
-            type="text"
-            onChange={(e) => setName(e.target.value)}
-            value={Name}
-            required
-          />
-        </div>
-}
+        {state === 'Sign up' && (
+          <div className="w-full">
+            <p className="text-sm text-gray-700">Full Name</p>
+            <input
+              className="border border-gray-300 rounded w-full p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              type="text"
+              onChange={(e) => setName(e.target.value)}
+              value={Name}
+              required
+            />
+          </div>
+        )}
 
-        {/* Email Field */}
         <div className="w-full">
           <p className="text-sm text-gray-700">Email</p>
           <input
@@ -49,7 +107,6 @@ const Login = () => {
           />
         </div>
 
-        {/* Password Field */}
         <div className="w-full">
           <p className="text-sm text-gray-700">Password</p>
           <input
@@ -61,7 +118,6 @@ const Login = () => {
           />
         </div>
 
-        {/* Submit Button */}
         <button
           onClick={onSubmitHandler}
           className="bg-indigo-600 text-white w-full py-3 rounded-md text-base mt-4 hover:bg-indigo-700 transition duration-200"
@@ -69,7 +125,6 @@ const Login = () => {
           {state === 'Sign up' ? 'Create Account' : 'Login'}
         </button>
 
-        {/* Switch to Sign Up / Login */}
         <p className="text-center text-sm text-gray-600 mt-4">
           {state === 'Sign up' ? (
             <span
@@ -88,6 +143,7 @@ const Login = () => {
           )}
         </p>
       </div>
+      <ToastContainer position="top-right" autoClose={2000} />
     </form>
   );
 };

@@ -7,13 +7,18 @@ export const AppContext = createContext();
 const AppContextProvider = (props) => {
 
   // Context value
+  const backendUrl=import.meta.env.VITE_Backend_URL
+  const[isLogin,setIslogin]=useState(false)
 
   const currencysymbol='$'
 
 
   const value = {
     doctors,
-    currencysymbol
+    currencysymbol,
+    backendUrl,
+    isLogin,
+    setIslogin
   };
 
   return (
