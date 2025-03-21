@@ -1,19 +1,47 @@
-import { createContext } from "react";
+import { createContext, useState } from "react";
 import { doctors } from "../assets/assets";
-
+import axios from 'axios'
 // Create context
 export const AppContext = createContext();
 
 const AppContextProvider = (props) => {
 
   // Context value
+  const backendUrl=import.meta.env.VITE_Backend_URL
+  const[isLogin,setIslogin]=useState(false)
+
+  const[userdata,setuserdata]=useState(false)
 
   const currencysymbol='$'
 
 
+  const getuser = async () => {
+    try {
+      const { data } = await axios.get('http://localhost:5000/api/auth/data', { withCredentials: true });
+      console.log(data);
+      if (data.success) {
+        setuserdata(data.userData); 
+        setIslogin(true); // optional if you are using isLogin elsewhere
+      } else {
+        setuserdata(false); // clear user data if not logged in
+        setIslogin(false);
+      }
+    } catch (error) {
+      setuserdata(false);
+      setIslogin(false);
+      console.error("Error fetching user:", error.message);
+    }
+  };
+  
+
   const value = {
     doctors,
-    currencysymbol
+    currencysymbol,
+    backendUrl,
+    isLogin,
+    setIslogin,
+    userdata,setuserdata,
+    getuser
   };
 
   return (
