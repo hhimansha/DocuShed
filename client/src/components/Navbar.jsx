@@ -1,38 +1,37 @@
-import React, { useEffect, useState } from 'react'
+import React, { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { assets } from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
+import { AppContext } from '@/Context/AppContext';
 
 const Navbar = () => {
     const navigate = useNavigate();
-    const [isLoggedIn, setIsLoggedIn] = useState(false); // default false
+    const [isLoggedIns, setIsLoggedIns] = useState(false); 
 
-    // Check login status
-    useEffect(() => {
-        const checkLogin = async () => {
-            try {
-                const { data } = await axios.get('http://localhost:5000/api/auth/checktoken', {
-                    withCredentials: true
-                });
-                console.log(data);
-                setIsLoggedIn(data.isLoggedIn);
-            } catch (error) {
-                setIsLoggedIn(false);
-            }
-        };
-        checkLogin();
-    }, []);
+   
+   const { backendUrl, setIslogin, isLogin, userdata, getuser } = useContext(AppContext);
 
-    // Logout handler
+   
     const logoutHandler = async () => {
         try {
-            await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
-            setIsLoggedIn(false);
-            navigate('/');
+          await axios.post('http://localhost:5000/api/auth/logout', {}, { withCredentials: true });
+          setIsLoggedIns(false);
+          setIslogin(false);
+          // Clear user data
+          window.location.reload(); // reload to re-check login status
         } catch (err) {
-            console.error("Logout failed");
+          console.error("Logout failed");
         }
-    };
+      };
+      
+
+    useEffect(() => {
+        const checkLogin = async () => {
+          await getuser();
+        };
+        checkLogin();
+      }, []);
+      
 
     return (
         <div className="flex items-center justify-between text-sm py-4 mb-5 border-b border-gray-400">
@@ -46,7 +45,7 @@ const Navbar = () => {
             </ul>
 
             <div className="flex items-center gap-4">
-                {isLoggedIn ? (
+                {userdata? (
                     <div className="relative group flex items-center gap-2 cursor-pointer">
                         <img className="w-8 rounded-full" src={assets.profile_pic} alt="" />
                         <img className="w-2.5" src={assets.dropdown_icon} alt="" />

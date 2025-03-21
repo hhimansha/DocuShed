@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
-  const { backendUrl,setIslogin } = useContext(AppContext);
+  const { backendUrl,setIslogin,getuser } = useContext(AppContext);
   const navigate = useNavigate();
 
   const [state, setState] = useState('Login');
@@ -33,24 +33,24 @@ const Login = () => {
         if (data.status === 'success') {
           const isAdmin = data.isAdmin;
           const isdoctor = data.isStaff;
-  
+        
+          // Call getuser to fetch user details & update context
+          await getuser();
+          setIslogin(true);
+        
           if (isAdmin) {
-            navigate('/admin');
-            setIslogin(true)
-
             toast.success("Admin Login Success");
+            navigate('/admin');
           } else if (isdoctor) {
-            navigate('/doctor');
-            setIslogin(true)
             toast.success("Doctor Login Success");
+            navigate('/doctor');
           } else {
-            navigate('/');
-            setIslogin(true)
             toast.success("Login Success");
+            
+            navigate('/');
           }
-        } else {
-          toast.error(data.message || "Login failed!");
         }
+        
       } else {
         const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
           name: Name,
