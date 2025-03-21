@@ -1,4 +1,4 @@
-import { createContext, useState } from "react";
+import { createContext, useState ,useEffect} from "react";
 import { doctors } from "../assets/assets";
 import axios from 'axios'
 // Create context
@@ -18,7 +18,7 @@ const AppContextProvider = (props) => {
   const getuser = async () => {
     try {
       const { data } = await axios.get('http://localhost:5000/api/auth/data', { withCredentials: true });
-      console.log(data);
+      //console.log(data);
       if (data.success) {
         setuserdata(data.userData); 
         setIslogin(true); // optional if you are using isLogin elsewhere
@@ -32,6 +32,13 @@ const AppContextProvider = (props) => {
       console.error("Error fetching user:", error.message);
     }
   };
+
+  
+
+useEffect(() => {
+  getuser(); // Call once on component mount
+}, []); // Empty dependency array ensures it only runs once
+
   
 
   const value = {

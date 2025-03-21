@@ -137,6 +137,11 @@
   background-color: var(--color-primary); /* ✅ Use it here */
 }
 
+.border-primary {
+  border-color: #5f6FFF !important;
+}
+
+
 .active hr {
   @apply block; /* ✅ Correct usage inside a selector */
 }

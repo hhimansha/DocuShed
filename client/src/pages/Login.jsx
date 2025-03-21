@@ -17,60 +17,60 @@ const Login = () => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-    //axios.defaults.withCredentials=true 
   
     try {
       if (state === 'Login') {
         const { data } = await axios.post('http://localhost:5000/api/auth/login', {
           email: Email,
           password: Password
-      }, {
-          withCredentials: true // This tells axios to send cookies with the request
-      });
-      
-        console.log(data); // For debugging
+        }, {
+          withCredentials: true
+        });
+  
+        console.log(data); // Debugging
   
         if (data.status === 'success') {
-          const isAdmin = data.isAdmin;
-          const isdoctor = data.isStaff;
-        
-          // Call getuser to fetch user details & update context
+          const { isAdmin, isStaff } = data;
+  
+          // Call once
           await getuser();
           setIslogin(true);
-        
+  
+          // Role-based redirect
           if (isAdmin) {
             toast.success("Admin Login Success");
+            await getuser();
+            setIslogin(true);
             navigate('/admin');
-          } else if (isdoctor) {
+          } else if (isStaff) {
+            await getuser();
+            setIslogin(true);
             toast.success("Doctor Login Success");
             navigate('/doctor');
           } else {
             toast.success("Login Success");
-            
             navigate('/');
           }
         }
-        
+  
       } else {
+        // Sign up logic
         const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
           name: Name,
           email: Email,
           password: Password
         });
   
-        console.log(data); // For debugging
-  
         if (data.success === true) {
           toast.success("Account Created! Please Login");
           setState('Login');
         }
-
-        
       }
     } catch (error) {
       toast.error(error.response?.data?.message || "Something went wrong!");
     }
   };
+  
   
   
   return (
