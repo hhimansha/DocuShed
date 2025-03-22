@@ -75,19 +75,19 @@ export const login = async (req, res) => {
     console.log(req.body);
 
     if (!email || !password) {
-        return res.json({ success: false, message: 'Email and password are required' })
+        return res.status(400).json({ success: false, message: 'Email and password are required' })
     }
 
     try {
         const user = await userModel.findOne({ email });
 
         if (!user) {
-            return res.json({ success: false, message: 'Invalid email' })
+            return res.status(400).json({ success: false, message: 'Invalid email' })
         }
         const isMatch = await bcrypt.compare(password, user.password)
 
         if (!isMatch) {
-            return res.json({ success: false, message: 'Invalid password' })
+            return res.status(400).json({ success: false, message: 'Invalid password' })
         }
 
 
@@ -101,14 +101,15 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
-
-        return res.json({ 
+        return res.status(200).json({ 
             status: 'success', 
+            message: 'login sucess',
             userId: user._id, 
             role: user.role, 
             isAdmin: user.role === 'admin', 
             isStaff: user.role === 'doctor' 
         });
+        
       
     } catch (error) {
         return res.json({ success: false, message: error.message })
@@ -157,23 +158,27 @@ export const logout = async(req,res)=>{
   export const getUserData =async(req,res)=>{
     try {
 
-      const {userId}=req.body;
+      const {userId,role }=req.body;
 
       const user = await userModel.findById(userId);
 
       if(!user){
         res.json({success:false,message :'user not found'});
       }
-
-      res.json({
-             success:true,
-             userData:{
-             name:user.name,
-             isAccountVerified:user.isAccountVerified
-            
-            }
-            
-            });
+      
+    
+        res.json({
+            success:true,
+            userData:{
+            name:user.name,
+            role:user.role,
+            isAccountVerified:user.isAccountVerified
+           
+           }
+           
+           });
+    
+     
       
     } catch (error) {
       res.json({success:false,message :error.message});
