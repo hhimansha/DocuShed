@@ -65,9 +65,10 @@ const App = () => {
           <Route path='/my-appointments' element={<MyApointment />} />
           <Route path='/appointment/:docId' element={<Appointment />} />
         </Routes>
+        
       )}
 
-      <Fotter />
+{!isAdminRoute && <Fotter />}
     </div>
   );
 };

@@ -3,6 +3,7 @@
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
 
 :root {
   --radius: 0.625rem;
@@ -134,7 +135,7 @@
 
 
 .bg-primary {
-  background-color: var(--color-primary); /* ✅ Use it here */
+  background-color: #5f6FFF; /* ✅ Use it here */
 }
 
 .border-primary {
@@ -150,4 +151,6 @@
   display: none; /* ✅ Use this instead of @apply hidden */
 }
 
-
+*{
+  font-family: outfit;
+}
