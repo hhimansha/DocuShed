@@ -5,17 +5,17 @@ import { useNavigate } from 'react-router-dom'
 
 const RelatedDoctor = ({speciality,docId}) => {
     
-    const {doctors}=useContext(AppContext)
+    const {usershowdoctors}=useContext(AppContext)
 
     const [relDoc,setRelDocs]=useState([])
     const navigate=useNavigate()
 
     useEffect(()=>{
-          if(doctors.length>0 && speciality){
-            const doctorsData=doctors.filter((doc)=>doc.speciality === speciality && doc._id !== docId)
+          if(usershowdoctors.length>0 && speciality){
+            const doctorsData=usershowdoctors.filter((doc)=>doc.speciality === speciality && doc._id !== docId)
             setRelDocs(doctorsData)
           }
-    },[doctors,docId])
+    },[usershowdoctors,docId])
     
   return (
     <div className='flex flex-col items-center gap-4 my-16 text-gray-500 md:mx-10 '>

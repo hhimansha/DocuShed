@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "../models/userModel.js";
 import Doctor from "../models/doctorModel.js";  // This is correct
+//import Doctor from "../models/doctorModel.js";
 
 
 // API for Admin to Add Doctor
@@ -61,6 +62,7 @@ const addDoctor = async (req, res) => {
             userId: userData._id,
             name,
             email,
+           image:imageUrl,
             speciality,
             degree,
             experience,
@@ -76,11 +78,21 @@ const addDoctor = async (req, res) => {
 
         res.status(201).json({ success: true, message: "Doctor added successfully!" });
 
+
     } catch (error) {
         console.error("Error adding doctor:", error);
         res.status(500).json({ success: false, message: "Server Error", error });
     }
 };
+const allDoctors = async (req, res) => {
+    try {
+      const doctors = await Doctor.find({}).select('-password');
+      res.json({ success: true, doctors });  // lowercase
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Server Error", error });
+    }
+  };
+  
 
 
-export { addDoctor };
+export { addDoctor,allDoctors };

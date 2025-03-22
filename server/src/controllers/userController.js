@@ -4,6 +4,7 @@ import userModel from '../models/userModel.js';
 import transporter from '../config/nodemailer.js';
 import { Email_very_template } from '../config/Emailtemplate.js';
 import validator from "validator";
+import Doctor from '../models/doctorModel.js';
 
 export const register = async (req, res) => {
     const { name, email, password } = req.body;
@@ -184,3 +185,13 @@ export const logout = async(req,res)=>{
       res.json({success:false,message :error.message});
     }
 }
+
+export const allDoctors = async (req, res) => {
+    try {
+      const doctors = await Doctor.find({}).select(['-password','-email']);
+      res.json({ success: true, doctors });  // lowercase
+    } catch (error) {
+      res.status(500).json({ success: false, message: "Server Error", error });
+    }
+  };
+  

@@ -9,14 +9,14 @@ import RelatedDoctor from '../Components/RelatedDoctor.jsx';
 const Appointment = () => {
   const { docId } = useParams(); // Use "docId" (not "docid")
 
-  const {doctors,currencysymbol}=useContext(AppContext)
+  const {usershowdoctors,currencysymbol}=useContext(AppContext)
 
   const [docInfo,setDocInfo]=useState(null)
 
 
 
   const fetchDocInfo = async ()=>{
-    const docInfo=doctors.find(doc => doc._id === docId )
+    const docInfo=usershowdoctors.find(doc => doc._id === docId )
     setDocInfo(docInfo)
    
   }
@@ -25,7 +25,7 @@ const Appointment = () => {
 
   useEffect(()=>{
      fetchDocInfo()
-  },[doctors,docId ])
+  },[usershowdoctors,docId ])
 
 
   return docInfo && (
