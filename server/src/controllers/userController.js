@@ -5,6 +5,7 @@ import transporter from '../config/nodemailer.js';
 import { Email_very_template } from '../config/Emailtemplate.js';
 import validator from "validator";
 import Doctor from '../models/doctorModel.js';
+//import { Email_very_template } from '../config/Emailtemplate.js';
 
 export const register = async (req, res) => {
     const { name, email, password } = req.body;
@@ -107,6 +108,7 @@ export const login = async (req, res) => {
             message: 'login sucess',
             userId: user._id, 
             role: user.role, 
+           
             isAdmin: user.role === 'admin', 
             isStaff: user.role === 'doctor' 
         });
@@ -173,6 +175,9 @@ export const logout = async(req,res)=>{
             userData:{
             name:user.name,
             role:user.role,
+            image:user.image,
+            name:user.name,
+            email:user.email,
             isAccountVerified:user.isAccountVerified
            
            }
@@ -195,3 +200,104 @@ export const allDoctors = async (req, res) => {
     }
   };
   
+
+
+  export const sendResetOtp = async (req,res)=>{
+    const {email}=req.body;
+    if(!email){
+        return res.json({success:false,message:'Email is required'})
+    }
+    try {
+        const user =await userModel.findOne({email});
+        if(!user){
+            return res.json({success:false,message:'User not found'})
+        }
+
+        const otp= String(Math.floor(100000+Math.random()*900000))  //0.123456*900000=111,110.4+100000=211,110.4=211110 6bit otp
+
+      user.resetOtp=otp;
+      user.resetOtpExpireAt=Date.now() + 15 * 60 * 1000
+
+      await user.save();
+
+      const mailOption={
+        from:process.env.SENDER_EMAIL,
+        to:user.email,
+        subject:'password rest  otp ',
+        html:Email_very_template.replace("{{otp}}",otp)
+    };
+
+    await transporter.sendMail(mailOption);
+
+    return res.json({success: true, message:'OTP sent to your email'});
+
+    } catch (error) {
+        return res.json({success:false,message:error.message})
+    }
+}
+
+export const resetpassword = async (req,res)=>{
+    const {email,otp,newPassword} = req.body
+
+    if(!email || !otp || !newPassword ){
+        return res.json({success:false,message:'Email ,OTP,and new password are required'})
+    }
+    try {
+        const user = await userModel.findOne({email});
+        if(!user){
+            return res.json({success:false,message:'user not found'})
+        }
+        if(user.resetOtp === "" || user.resetOtp !== otp){
+            return res.status(400).json({success:false,message:"Invalid OTP"});
+        }
+
+        if (newPassword.length < 8) {
+            return res.status(400).json({ success: false, message: "Please enter a strong password (min 8 characters)" });
+        }
+
+
+        if(user.resetOtpExpireAt< Date.now()){
+            return res.status(400).json({success:false,message:'OTP expired'})
+        }
+
+        const hashpassword = await bcrypt.hash(newPassword,10);
+
+        user.password=hashpassword;
+        user.resetOtp='';
+        user.resetOtpExpireAt =0;
+
+        await user.save();
+         
+        return res.status(200).json({success:true,message:'password hash been reset successfully'});
+
+        
+    } catch (error) {
+        return res.status(400).json({success:false,message:error.message})
+    }
+}
+
+export const verifyResetOtp = async (req, res) => {
+    const { email, otp } = req.body;
+
+    if (!email || !otp) {
+        return res.json({ success: false, message: "Email and OTP are required" });
+    }
+
+    try {
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.json({ success: false, message: "User not found" });
+        }
+        if (user.resetOtp !== otp) {
+            return res.json({ success: false, message: "Invalid OTP" });
+        }
+        if (user.resetOtpExpireAt < Date.now()) {
+            return res.json({ success: false, message: "OTP expired" });
+        }
+
+        return res.json({ success: true, message: "OTP verified successfully" });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+};

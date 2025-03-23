@@ -1,7 +1,10 @@
 import React, { useContext, useEffect, useState } from 'react'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { AppContext } from '../Context/AppContext'
 import { assets } from '../assets/assets';
+
+import { toast } from "react-toastify";
+
 
 import RelatedDoctor from '../Components/RelatedDoctor.jsx';
 
@@ -9,23 +12,36 @@ import RelatedDoctor from '../Components/RelatedDoctor.jsx';
 const Appointment = () => {
   const { docId } = useParams(); // Use "docId" (not "docid")
 
-  const {usershowdoctors,currencysymbol}=useContext(AppContext)
+  const { usershowdoctors, currencysymbol, userdata, available } = useContext(AppContext)
 
-  const [docInfo,setDocInfo]=useState(null)
+  const [docInfo, setDocInfo] = useState(null)
+  const navigate = useNavigate();
 
 
-
-  const fetchDocInfo = async ()=>{
-    const docInfo=usershowdoctors.find(doc => doc._id === docId )
+  const fetchDocInfo = async () => {
+    const docInfo = usershowdoctors.find(doc => doc._id === docId)
     setDocInfo(docInfo)
-   
+
   }
+  const handleAppointmentClick = () => {
+    if (!docInfo.available) {
+      toast.error(`${docInfo.name} is currently not available!`);
+      return;
+    }
+    if (userdata) {
+      navigate('/getappointment');
+    } else {
+      toast.error('Please login first!');
+      navigate('/login');
+    }
+  };
 
-  
 
-  useEffect(()=>{
-     fetchDocInfo()
-  },[usershowdoctors,docId ])
+
+
+  useEffect(() => {
+    fetchDocInfo()
+  }, [usershowdoctors, docId])
 
 
   return docInfo && (
@@ -54,14 +70,30 @@ const Appointment = () => {
             {docInfo.experience}  Experience
           </button>
           <div className="mt-6">
-        <p className="text-xl font-medium text-gray-800 flex items-center gap-2">
-          About
-          <img className="w-5 h-5" src={assets.info_icon} alt="Info" />
-        </p>
-        <p className="text-gray-600 mt-2 leading-relaxed">{docInfo.about}</p>
-        <p className="text-gray-600 mt-2 leading-relaxed">Appointment fees:<span className='bg-amber-300 font-bold'>{currencysymbol}{docInfo.fees}</span></p>  <br />
-         <button className="bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block">Get Appointment</button> <br />
-      </div>
+            <p className="text-xl font-medium text-gray-800 flex items-center gap-2">
+              About
+              <img className="w-5 h-5" src={assets.info_icon} alt="Info" />
+            </p>
+            <p className="text-gray-600 mt-2 leading-relaxed">{docInfo.about}</p>
+            <p className="text-gray-600 mt-2 leading-relaxed">Appointment fees:<span className='bg-amber-300 font-bold'>{currencysymbol}{docInfo.fees}</span></p>  <br />
+            {userdata.role === 'admin' ? (
+              ""
+            ) : (
+              <>
+                <button
+                  onClick={handleAppointmentClick}
+                  className={`px-8 py-3 rounded-full font-light hidden md:block ${docInfo.available ? "bg-primary text-white" : "bg-gray-400 text-gray-700 cursor-not-allowed"
+                    }`}
+                  //disabled={!docInfo.available} // Disable if not available
+                >
+                  {!docInfo.available ? `${docInfo.name} is not available` : "Get Appointment"}
+                </button>
+                <br />
+              </>
+            )}
+
+
+          </div>
         </div>
       </div>
       <div>
@@ -71,14 +103,14 @@ const Appointment = () => {
       <div>
 
       </div>
-      
+
 
       {/* Doctor Related Section */}
 
-      <RelatedDoctor docId={docId} speciality={docInfo.speciality}/>
-      
+      <RelatedDoctor docId={docId} speciality={docInfo.speciality} />
+
     </div>
-   
+
   )
 }
 

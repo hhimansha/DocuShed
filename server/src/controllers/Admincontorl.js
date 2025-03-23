@@ -92,7 +92,33 @@ const allDoctors = async (req, res) => {
       res.status(500).json({ success: false, message: "Server Error", error });
     }
   };
+
+
+  // API to get dahbord data for admin pannel
+
+  const admindashbord = async (req,res) =>{
+    try {
+        const doctors =await Doctor.find({})
+        const users = await userModel.find({
+            role: 'user'
+          });
+
+
+          const dashData= {
+            doctors: doctors.length,
+            patients:users.length
+          }
+
+          res.json({success:true,dashData})
+          
+        
+    } catch (error) {
+        console.log(error)
+        res.status(500).json({ success: false, message: "Server Error", error });
+        
+    }
+  }
   
 
 
-export { addDoctor,allDoctors };
+export { addDoctor,allDoctors,admindashbord };

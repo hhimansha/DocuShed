@@ -14,6 +14,7 @@ const AppContextProvider = (props) => {
   const [usershowdoctors, setusershowdocters] = useState([]);
   const [loading, setLoading] = useState(false); 
    const[available ,setavailable] =useState(false)                                             // Optional: loading state
+   const[dashData,setDashdata]=useState(false)
 
   const currencysymbol = '$';
 
@@ -91,6 +92,21 @@ const AppContextProvider = (props) => {
     }
   };
 
+  const getdahdata = async ()=>{
+    try {
+      const {data} =await axios.get(backendUrl + '/api/admin/dashbord', { withCredentials: true })
+      if(data.success){
+        setDashdata(data.dashData) 
+        console.log(data.dashData)
+      }else{
+        toast.error(data.message)
+      }
+    } catch (error) {
+      toast.error(error.message);
+      
+    }
+  }
+
   useEffect(() => {
     getDoctorsData();
   }, []); // Runs once when component mounts
@@ -115,7 +131,8 @@ const AppContextProvider = (props) => {
     usershowdoctors,
     loading, // Added loading to context value
     setavailable,
-    available
+    available,
+    dashData,getdahdata
   };
 
   return (

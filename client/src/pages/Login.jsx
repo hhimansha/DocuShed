@@ -41,7 +41,7 @@ const Login = () => {
             toast.success("Admin Login Success");
             await getuser();
             setIslogin(true);
-            navigate('/admin');
+            navigate('/admin/dashbord');
           } else if (isStaff) {
             await getuser();
             setIslogin(true);
@@ -118,6 +118,14 @@ const Login = () => {
           />
         </div>
 
+        {state === "Login" && (
+        <p
+          className="text-indigo-600 cursor-pointer hover:underline"
+          onClick={() => navigate('/reset-password')}
+        >
+          Forget password
+        </p>
+      )}
         <button
           onClick={onSubmitHandler}
           className="bg-indigo-600 text-white w-full py-3 rounded-md text-base mt-4 hover:bg-indigo-700 transition duration-200"

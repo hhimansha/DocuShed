@@ -1,102 +1,99 @@
 export const Email_very_template=`<!DOCTYPE html>
-<html>
+<html lang="en" style="margin: 0; padding: 0;">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Email Verification</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            background-color: #f4f4f4;
-            text-align: center;
-        }
-        .container {
-            max-width: 600px;
-            margin: 20px auto;
-            background: #fff;
-            padding: 20px;
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-        }
-        .header {
-            padding: 20px 0;
-        }
-        .header img {
-            width: 80px;
-        }
-        .content {
-            padding: 20px;
-        }
-        .otp-container {
-            display: flex;
-            justify-content: center;
-            gap: 10px;
-            margin: 20px 0;
-        }
-        .otp-input {
-            width: 40px;
-            height: 40px;
-            text-align: center;
-            font-size: 18px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-        .btn {
-            display: inline-block;
-            padding: 10px 20px;
-            background: #008cba;
-            color: white;
-            text-decoration: none;
-            border-radius: 5px;
-            margin-top: 10px;
-        }
-        .footer {
-            margin-top: 20px;
-            padding: 20px;
-            background: #17a2b8;
-            color: white;
-            border-radius: 0 0 8px 8px;
-        }
-        .social-icons {
-            margin-top: 10px;
-        }
-        .social-icons a {
-            margin: 0 5px;
-            display: inline-block;
-        }
-        .social-icons img {
-            width: 24px;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Reset Password - Prescripto</title>
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background-color: #f4f6fb;
+      font-family: 'Arial', sans-serif;
+    }
+    .container {
+      max-width: 600px;
+      margin: 40px auto;
+      background-color: #ffffff;
+      border-radius: 10px;
+      overflow: hidden;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+    .header {
+      background: linear-gradient(90deg, #4f46e5, #7c3aed);
+      padding: 20px;
+      text-align: center;
+      color: #fff;
+    }
+    .header h1 {
+      margin: 0;
+      font-size: 28px;
+    }
+    .body {
+      padding: 30px;
+      color: #333;
+      text-align: center;
+    }
+    .body h2 {
+      margin-bottom: 10px;
+      color: #4f46e5;
+    }
+    .otp {
+      font-size: 24px;
+      font-weight: bold;
+      background-color: #f3f4f6;
+      padding: 12px 20px;
+      margin: 20px auto;
+      display: inline-block;
+      letter-spacing: 2px;
+      border-radius: 6px;
+      color: #111827;
+    }
+    .button {
+      display: inline-block;
+      padding: 12px 25px;
+      background-color: #4f46e5;
+      color: #fff;
+      text-decoration: none;
+      border-radius: 6px;
+      margin-top: 20px;
+      font-weight: bold;
+    }
+    .footer {
+      background-color: #f9fafb;
+      padding: 20px;
+      text-align: center;
+      font-size: 12px;
+      color: #6b7280;
+    }
+    @media (max-width: 600px) {
+      .header h1 { font-size: 22px; }
+      .body h2 { font-size: 20px; }
+      .otp { font-size: 20px; }
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <img src="https://cdn-icons-png.flaticon.com/512/3176/3176365.png" alt="Email Icon">
-        </div>
-        <div class="content">
-            <h2>Verify Your Email Address</h2>
-            <p>A verification code has been sent to <strong>{{email}}</strong></p>
-            <p>Please check your inbox and enter the verification code below.</p>
-            <div class="otp-container">
-                {{otp}}
-            </div>
-            <a href="#" class="btn">Verify</a>
-            <p><a href="#">Resend Code</a> | <a href="#">Change Email</a></p>
-        </div>
-        <div class="footer">
-            <p>Thanks for the support! ❤</p>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-            <div class="social-icons">
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/733/733547.png" alt="Facebook"></a>
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Twitter"></a>
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/174/174857.png" alt="LinkedIn"></a>
-                <a href="#"><img src="https://cdn-icons-png.flaticon.com/512/2111/2111463.png" alt="Instagram"></a>
-            </div>
-        </div>
+  <div class="container">
+    <div class="header">
+      <h1>Prescripto</h1>
     </div>
+    <div class="body">
+      <h2>Reset Your Password</h2>
+      <p>Hello,</p>
+      <p>We received a request to reset your password for your <strong>Prescripto</strong> account.</p>
+      <p>Use the OTP below to proceed:</p>
+      <div class="otp">{{otp}}</div>
+      <p>This OTP is valid for 10 minutes.</p>
+      <a  class="button">Reset Password</a>
+      <p style="margin-top: 30px;">If you did not request a password reset, please ignore this email.</p>
+    </div>
+    <div class="footer">
+      &copy; 2025 Prescripto. All Rights Reserved. <br />
+      Need help? <a href="mailto:support@prescripto.com">Contact Support</a>
+    </div>
+  </div>
 </body>
 </html>
+
 `
