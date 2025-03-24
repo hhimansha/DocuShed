@@ -20,6 +20,7 @@ import Dasgbord from './pages/Admin/Dasgbord';
 import AllAppointment from './pages/Admin/AllAppointment';
 import AddDoctor from './pages/Admin/AddDoctor';
 import DoctorsList from './pages/Admin/DoctorsList';
+import ResetPassword from './pages/ResetPassword';
 
 const App = () => {
   const location = useLocation();
@@ -64,6 +65,8 @@ const App = () => {
           <Route path='/my-profile' element={<Myprofile />} />
           <Route path='/my-appointments' element={<MyApointment />} />
           <Route path='/appointment/:docId' element={<Appointment />} />
+          <Route path='/reset-password' element={<ResetPassword />} />
+          
         </Routes>
         
       )}

@@ -6,7 +6,7 @@ import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
 const Login = () => {
-  const { backendUrl,setIslogin,getuser } = useContext(AppContext);
+  const { backendUrl, setIslogin, getuser } = useContext(AppContext);
   const navigate = useNavigate();
 
   const [state, setState] = useState('Login');
@@ -17,7 +17,7 @@ const Login = () => {
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
-  
+
     try {
       if (state === 'Login') {
         const { data } = await axios.post('http://localhost:5000/api/auth/login', {
@@ -26,22 +26,24 @@ const Login = () => {
         }, {
           withCredentials: true
         });
-  
+
         console.log(data); // Debugging
-  
+
         if (data.status === 'success') {
           const { isAdmin, isStaff } = data;
-  
+
           // Call once
           await getuser();
           setIslogin(true);
-  
+
           // Role-based redirect
           if (isAdmin) {
             toast.success("Admin Login Success");
             await getuser();
             setIslogin(true);
-            navigate('/admin');
+            navigate('/admin/dashbord');
+            window.location.href = '/admin/dashbord'; // Full page reload without setTimeout
+
           } else if (isStaff) {
             await getuser();
             setIslogin(true);
@@ -52,7 +54,7 @@ const Login = () => {
             navigate('/');
           }
         }
-  
+
       } else {
         // Sign up logic
         const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
@@ -60,7 +62,7 @@ const Login = () => {
           email: Email,
           password: Password
         });
-  
+
         if (data.success === true) {
           toast.success("Account Created! Please Login");
           setState('Login');
@@ -70,9 +72,9 @@ const Login = () => {
       toast.error(error.response?.data?.message || "Something went wrong!");
     }
   };
-  
-  
-  
+
+
+
   return (
     <form className="min-h-screen flex items-center justify-center bg-gradient-to-br">
       <div className="flex flex-col gap-6 p-8 min-w-[340px] sm:min-w-[400px] bg-white rounded-xl shadow-lg border-1">
@@ -118,6 +120,14 @@ const Login = () => {
           />
         </div>
 
+        {state === "Login" && (
+          <p
+            className="text-indigo-600 cursor-pointer hover:underline"
+            onClick={() => navigate('/reset-password')}
+          >
+            Forget password
+          </p>
+        )}
         <button
           onClick={onSubmitHandler}
           className="bg-indigo-600 text-white w-full py-3 rounded-md text-base mt-4 hover:bg-indigo-700 transition duration-200"

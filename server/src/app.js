@@ -23,4 +23,5 @@ app.get('/',(req,res)=>res.send("API working fine"));
  app.use("/api/admin", adminRouter)
  app.use("/api/auth",authrouter)
  
+ 
 export default app;
