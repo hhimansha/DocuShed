@@ -29,11 +29,10 @@ import Doctorprofile from './pages/Doctor/Doctorprofile';
 const App = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const isDoctorRoute = location.pathname.startsWith('/doctor');
+  const isDoctorRoute = location.pathname.startsWith('/doctorsssssss');
 
   return (
     <div className={!isAdminRoute && !isDoctorRoute ? 'mx-4 sm:mx-[10%]' : ''}>
-
       <ToastContainer position="top-right" autoClose={2000} />
 
       {/* Show Navbar only if not admin or doctor route */}
@@ -86,11 +85,9 @@ const App = () => {
             <div className="flex-1">
               <Routes>
                 {/* Doctor routes inside sidebar layout */}
-                
-     
-                <Route path='/doctor' element={<Doctordashbord />} />
-                 <Route path='/doctor-appointment' element={<DoctorAppointment />} />
-                 <Route path='/doctor-profile' element={<Doctorprofile />} />
+                <Route path='/doctorsssssss' element={<Doctordashbord />} />
+                <Route path='/doctorsssssss-appointment' element={<DoctorAppointment />} />
+                <Route path='/doctorsssssss-profile' element={<Doctorprofile />} />
               </Routes>
             </div>
           </div>

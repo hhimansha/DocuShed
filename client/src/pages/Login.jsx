@@ -48,7 +48,7 @@ const Login = () => {
             await getuser();
             setIslogin(true);
             toast.success("Doctor Login Success");
-            navigate('/doctor');
+            navigate('/doctorsssssss');
           } else {
             toast.success("Login Success");
             navigate('/');
