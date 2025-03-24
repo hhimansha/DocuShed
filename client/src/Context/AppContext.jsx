@@ -15,6 +15,7 @@ const AppContextProvider = (props) => {
   const [loading, setLoading] = useState(false); 
    const[available ,setavailable] =useState(false)                                             // Optional: loading state
    const[dashData,setDashdata]=useState(false)
+   const [profileDta,setProfileData]=useState(false)
 
   const currencysymbol = '$';
 
@@ -107,6 +108,20 @@ const AppContextProvider = (props) => {
     }
   }
 
+  const getdoctorprofiledata = async () => {
+    try {
+      const { data } = await axios.get(backendUrl + '/api/doctor/profile', { withCredentials: true });
+      if (data.success) {
+        setProfileData(data.profileDta);
+        console.log(data.profileDta);
+      }
+    } catch (error) {
+      console.log(error);
+      toast.error(error.message);
+    }
+  };
+  
+
   useEffect(() => {
     getDoctorsData();
   }, []); // Runs once when component mounts
@@ -132,7 +147,8 @@ const AppContextProvider = (props) => {
     loading, // Added loading to context value
     setavailable,
     available,
-    dashData,getdahdata
+    dashData,getdahdata,
+    getdoctorprofiledata,profileDta,setProfileData
   };
 
   return (

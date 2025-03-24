@@ -5,6 +5,7 @@ import { connectDB } from "./config/db.js";
 import cookieParser from "cookie-parser";
 import adminRouter from "./routes/AdminRoutes.js";
 import authrouter  from "./routes/userRoutes.js"
+import doctorRouter from "./routes/DoctorRoute.js";
 // import userRoutes from "./routes/userRoutes";
 
 dotenv.config();
@@ -22,6 +23,7 @@ app.get('/',(req,res)=>res.send("API working fine"));
 // Routes
  app.use("/api/admin", adminRouter)
  app.use("/api/auth",authrouter)
+ app.use("/api/doctor",doctorRouter)
  
  
 export default app;
