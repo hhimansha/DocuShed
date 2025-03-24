@@ -51,7 +51,7 @@ const Appointment = () => {
         {/* Doctor Image */}
         <div className="sm:w-1/3">
           <img
-            className="bg-indigo-100 w-full sm:max-w-72 rounded-lg"
+            className="bg-indigo-100 w-full sm:max-w-72 rounded-lg "
             src={docInfo.image}
             alt={docInfo.name}
           />
