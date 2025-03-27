@@ -48,7 +48,8 @@ const Login = () => {
             await getuser();
             setIslogin(true);
             toast.success("Doctor Login Success");
-            navigate('/doctorsssssss');
+            navigate('/doctordash');
+            window.location.href = '/doctordash';
           } else {
             toast.success("Login Success");
             navigate('/');
@@ -76,8 +77,8 @@ const Login = () => {
 
 
   return (
-    <form className="min-h-screen flex items-center justify-center bg-gradient-to-br">
-      <div className="flex flex-col gap-6 p-8 min-w-[340px] sm:min-w-[400px] bg-white rounded-xl shadow-lg border-1">
+    <form className="min-h-screen flex items-center justify-center bg-gradient-to-br ">
+      <div className="flex flex-col gap-6 p-8 min-w-[340px] sm:min-w-[400px] bg-white rounded-xl shadow-lg border-1 border-2 border-black">
         <p className="text-2xl font-semibold text-center text-gray-800">
           {state === 'Sign up' ? 'Create Account' : 'Login'}
         </p>
@@ -98,8 +99,8 @@ const Login = () => {
           </div>
         )}
 
-        <div className="w-full">
-          <p className="text-sm text-gray-700">Email</p>
+        <div className="w-full ">
+          <p className="text-sm text-gray-700 ">Email</p>
           <input
             className="border border-gray-300 rounded w-full p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-400"
             type="email"
@@ -121,12 +122,16 @@ const Login = () => {
         </div>
 
         {state === "Login" && (
-          <p
-            className="text-indigo-600 cursor-pointer hover:underline"
-            onClick={() => navigate('/reset-password')}
-          >
-            Forget password
-          </p>
+      <p
+      className="text-indigo-600 cursor-pointer hover:underline"
+      onClick={() => {
+        navigate('/reset-password');
+        window.location.href = '/reset-password';
+      }}
+    >
+      Forget password
+    </p>
+    
         )}
         <button
           onClick={onSubmitHandler}

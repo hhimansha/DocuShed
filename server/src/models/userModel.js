@@ -18,6 +18,11 @@ const userSchema = new mongoose.Schema({
         default: 'user' // Default role is 'user'
     },
     image: { type: String, default: "" },
+    phone: { type: String, default:'' },
+    address: { type: Object, default:'' },
+    gender: { type: String, default:'' },
+   
+    
 
     // Link to the Doctor model (reference)
     doctorDetails: { type: mongoose.Schema.Types.ObjectId, ref: 'Doctor', default: null },

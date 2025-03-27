@@ -12,6 +12,7 @@ const doctorSchema = new mongoose.Schema({
     available: { type: Boolean, default: false },
     fees: { type: Number, required: true },
     address: { type: Object, required:true },
+    birthday: { type: Date,},
     
     date: { type: Number, default: Date.now },
     slots_booked: { type: Object, default: {} }

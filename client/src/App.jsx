@@ -25,11 +25,12 @@ import Doctordashbord from './pages/Doctor/Doctordashbord';
 
 import DoctorAppointment from './pages/Doctor/DoctorAppointment';
 import Doctorprofile from './pages/Doctor/Doctorprofile';
+import PatientList from './pages/Admin/PatientList';
 
 const App = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const isDoctorRoute = location.pathname.startsWith('/doctorsssssss');
+  const isDoctorRoute = location.pathname.startsWith('/doctordash');
 
   return (
     <div className={!isAdminRoute && !isDoctorRoute ? 'mx-4 sm:mx-[10%]' : ''}>
@@ -52,6 +53,7 @@ const App = () => {
                 <Route path='/admin/all-appointment' element={<AllAppointment />} />
                 <Route path='/admin/addDoctor' element={<AddDoctor />} />
                 <Route path='/admin/DoctorsList' element={<DoctorsList />} />
+                <Route path='/admin/PatientList' element={<PatientList/>}/>
               </Routes>
             </div>
           </div>
@@ -85,9 +87,9 @@ const App = () => {
             <div className="flex-1">
               <Routes>
                 {/* Doctor routes inside sidebar layout */}
-                <Route path='/doctorsssssss' element={<Doctordashbord />} />
-                <Route path='/doctorsssssss-appointment' element={<DoctorAppointment />} />
-                <Route path='/doctorsssssss-profile' element={<Doctorprofile />} />
+                <Route path='/doctordash' element={<Doctordashbord />} />
+                <Route path='/doctordash-appointment' element={<DoctorAppointment />} />
+                <Route path='/doctordash-profile' element={<Doctorprofile />} />
               </Routes>
             </div>
           </div>

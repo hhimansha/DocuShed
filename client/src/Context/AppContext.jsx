@@ -16,7 +16,7 @@ const AppContextProvider = (props) => {
    const[available ,setavailable] =useState(false)                                             // Optional: loading state
    const[dashData,setDashdata]=useState(false)
    const [profileDta,setProfileData]=useState(false)
-
+  const [patient,setpatints]=useState([])
   const currencysymbol = '$';
 
   // Fetch all doctors
@@ -121,6 +121,21 @@ const AppContextProvider = (props) => {
     }
   };
   
+  const geallpatints = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/auth/allpatient`, { // Ensure correct API endpoint
+        withCredentials: true
+      });
+      if (data.success) {
+        setpatints(data.patient); // ✅ Use 'patient' (from backend response)
+        console.log(data.patient); // Debugging
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+};
 
   useEffect(() => {
     getDoctorsData();
@@ -129,6 +144,35 @@ const AppContextProvider = (props) => {
   useEffect(() => {
     getuser(); // Fetch user data once on component mount
   }, []);
+
+  const deletePatient = async (patientId)=>{
+    try {
+      const {data}=await axios.delete(`${backendUrl}/api/admin/patients/${patientId}`,{withCredentials:true})
+      if (data.success) {
+        toast.success(data.message);
+        geallpatints();
+
+      }
+    } catch (error) {
+      
+    }
+
+  }
+
+  
+  const deletedoctor = async (doctorId)=>{
+    try {
+      const {data}=await axios.delete(`${backendUrl}/api/admin/doctordelete/${doctorId}`,{withCredentials:true})
+      if (data.success) {
+        toast.success(data.message);
+        gealldoctos();
+
+      }
+    } catch (error) {
+      
+    }
+
+  }
 
   const value = {
     
@@ -148,7 +192,8 @@ const AppContextProvider = (props) => {
     setavailable,
     available,
     dashData,getdahdata,
-    getdoctorprofiledata,profileDta,setProfileData
+    getdoctorprofiledata,profileDta,setProfileData,
+    setpatints,patient,geallpatints,deletePatient,deletedoctor
   };
 
   return (

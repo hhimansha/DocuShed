@@ -18,6 +18,7 @@ const Navbar = () => {
           setIsLoggedIns(false);
           setIslogin(false);
           // Clear user data
+          navigate('/');
           window.location.reload(); // reload to re-check login status
         } catch (err) {
           console.error("Logout failed");
@@ -47,7 +48,7 @@ const Navbar = () => {
             <div className="flex items-center gap-4">
                 {userdata.role=="user"? (
                     <div className="relative group flex items-center gap-2 cursor-pointer">
-                        <img className="w-8 rounded-full" src={assets.profile_pic} alt="" />
+                        <img className="w-8 rounded-full  " src={userdata?.image ?userdata.image:assets.upload_area}  alt="" />
                         <img className="w-2.5" src={assets.dropdown_icon} alt="" />
                         <div className="absolute top-full right-0 mt-2 w-48 bg-stone-100 rounded-lg shadow-lg text-gray-600 text-base font-medium z-50 opacity-0 group-hover:opacity-100 group-hover:visible transition-opacity duration-200">
                             <div className="flex flex-col gap-4 p-4">

@@ -94,10 +94,10 @@ const ResetPassword = () => {
     }
 
   return (
-    <div className='flex items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-br from-white to-white'>
+    <div className='flex items-center justify-center min-h-screen px-6 sm:px-0 bg-gradient-to-br from-white to-white '>
        
        {!isemailsent &&
-       <form onSubmit={onsubmitemail} className='bg-white p-8 rounded-lg shadow-lg w-96 text-sm'>
+       <form onSubmit={onsubmitemail} className='bg-white p-8 rounded-lg shadow-lg w-96 text-sm border-2 border-black'>
        <h1 className='text-black text-2xl font-semibold text-center mb-4'>Reset password</h1>
        <p className='text-center mb-6 text-black0'>Enter your registed emil address</p>
        <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-white'>

@@ -119,7 +119,60 @@ const allDoctors = async (req, res) => {
     }
   }
 
+  const allpatient = async (req, res) => {
+    try {
+        const patients = await userModel.find({ role: "user" }).select('-password'); // Filter users with role "user"
+        res.status(200).json({ success: true, patient: patients }); 
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Server Error", error: error.message });
+    }
+};
+
+const patientdelete = async (req, res) => {
+    try {
+      const patientid = req.params.id; 
+      const deletepatients = await userModel.findByIdAndDelete(patientid);
+  
+      if (!deletepatients) {
+        return res.status(404).json({ success: false, message: 'Patient not found' });
+      }
+  
+      res.json({ success: true, message: 'Patient deleted successfully' });
+  
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ success: false, message: 'Server error' });
+    }
+  };
+
+  const doctordelete = async (req, res) => {
+    try {
+        const doctorId = req.params.id; // ID from doctor collection
+
+        // Find the doctor entry to get the userId
+        const doctor = await Doctor.findById(doctorId);
+        if (!doctor) {
+            return res.status(404).json({ success: false, message: 'Doctor not found' });
+        }
+
+        const userId = doctor.userId; // Get the corresponding userId
+
+        // Delete the doctor from the Doctor collection
+        await Doctor.findByIdAndDelete(doctorId);
+
+        // Delete the user from the User collection
+        await userModel.findByIdAndDelete(userId);
+
+        res.json({ success: true, message: 'Doctor  deleted successfully' });
+
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ success: false, message: 'Server error' });
+    }
+};
+
+
   
 
 
-export { addDoctor,allDoctors,admindashbord };
+export { addDoctor,allDoctors,admindashbord,allpatient,patientdelete,doctordelete };
