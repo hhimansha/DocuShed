@@ -26,9 +26,6 @@ import Doctordashbord from './pages/Doctor/Doctordashbord';
 import DoctorAppointment from './pages/Doctor/DoctorAppointment';
 import Doctorprofile from './pages/Doctor/Doctorprofile';
 import PatientList from './pages/Admin/PatientList';
-import MyAppointments from './pages/MyApointment';
-
-
 
 const App = () => {
   const location = useLocation();
@@ -54,8 +51,6 @@ const App = () => {
                 <Route path='/admin' element={<Admindashbord />} />
                 <Route path='/admin/dashbord' element={<Dasgbord />} />
                 <Route path='/admin/all-appointment' element={<AllAppointment />} />
-                <Route path='/appointment/:docId' element={<Appointment />} />
-                <Route path='/my-appointments' element={<MyAppointments />} />
                 <Route path='/admin/addDoctor' element={<AddDoctor />} />
                 <Route path='/admin/DoctorsList' element={<DoctorsList />} />
                 <Route path='/admin/PatientList' element={<PatientList/>}/>
