@@ -167,11 +167,11 @@ export const getUserData = async (req, res) => {
         const user = await userModel.findById(userId);
 
         if (!user) {
-            res.json({ success: false, message: 'user not found' });
+            return  res.json({ success: false, message: 'user not found' });
         }
 
 
-        res.json({
+        return res.json({
             success: true,
             userData: {
                 name: user.name,
@@ -378,5 +378,34 @@ export const userRestPassword = async (req, res) => {
   }
 };
 
+
+export const deleteUserAccount = async (req, res) => {
+    try {
+        const { userId } = req.body;
+
+        if (!userId) {
+            return res.status(400).json({ success: false, message: "User ID is required" });
+        }
+
+        const deletedUser = await userModel.findByIdAndDelete(userId);
+
+        if (!deletedUser) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // Clear cookie before sending the response
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+        });
+
+        return res.status(200).json({ success: true, message: "Account deleted successfully" });
+
+    } catch (error) {
+        console.error("Delete User Error:", error);
+        return res.status(500).json({ success: false, message: "Internal server error" });
+    }
+};
 
 

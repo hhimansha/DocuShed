@@ -2,13 +2,17 @@ import { assets } from '@/assets/assets';
 import { AppContext } from '@/Context/AppContext';
 import axios from 'axios';
 import React, { useContext, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const MyProfile = () => {
   const { userdata, getuser, backendUrl } = useContext(AppContext);
   const [showPasswordChange, setShowPasswordChange] = useState(false);
   const [isEdit, setIsEdit] = useState(false);
   const [image, setImage] = useState(false);
+  const navigator =useNavigate();
 
   // Editable Fields
   const [name, setName] = useState(userdata?.name || '');
@@ -86,7 +90,46 @@ const MyProfile = () => {
   };
 
 
-
+  const deletehadeler = async () => {
+    toast.warn(
+      <div>
+        <p>Are you sure you want to delete this profile?</p>
+        <div className="flex gap-3 mt-2">
+          <button
+            onClick={async () => { // Make the callback function async
+              try {
+                const { data } = await axios.delete(`${backendUrl}/api/auth/delete-user`,{withCredentials:true});
+                toast.dismiss();
+                toast.success('Account deleted successfully!');
+                await getuser(); 
+                navigator('/');
+              } catch (error) {
+                toast.dismiss();
+                toast.error(error.response?.data?.message || 'Failed to delete account');
+              }
+            }}
+            className="bg-red-500 text-white px-3 py-1 rounded"
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            className="bg-gray-500 text-white px-3 py-1 rounded"
+          >
+            No
+          </button>
+        </div>
+      </div>,
+      {
+        position: "top-right",
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        closeButton: false
+      }
+    );
+  };
+  
 
 
 
@@ -172,37 +215,45 @@ const MyProfile = () => {
         )}
       </div>
 
-      <div className="mt-6 flex space-x-4">
-        {isEdit ? (
-          <button onClick={updateUserProfile} className="px-4 py-1 border border-primary text-sm rounded-full mt-5 hover:bg-blue-700 hover:text-white transition-all">
-            Save
-          </button>
-        ) : (
+      <div className="mt-6 flex justify-between items-center">
+        <div className="flex space-x-4">
+          {isEdit ? (
+            <button
+              onClick={updateUserProfile}
+              className="px-4 py-1 border border-primary text-sm rounded-full mt-5 hover:bg-blue-700 hover:text-white transition-all"
+            >
+              Save
+            </button>
+          ) : (
+            <button
+              onClick={() => {
+                setIsEdit(true);
+                setName(userdata?.name || "");
+                setPhone(userdata?.phone || "");
+                setAddress(userdata?.address?.line1 || "");
+                setAddress2(userdata?.address?.line2 || "");
+                setGender(userdata?.gender || "");
+                setBirthday(userdata?.birthday || "");
+              }}
+              className="px-4 py-1 border border-primary text-sm rounded-full mt-5 hover:bg-blue-700 hover:text-white transition-all"
+            >
+              Edit
+            </button>
+          )}
           <button
-            onClick={() => {
-              setIsEdit(true);
-              setName(userdata?.name || "");
-              setPhone(userdata?.phone || "");
-              setAddress(userdata?.address?.line1 || "");
-              setAddress2(userdata?.address?.line2 || "");
-              setGender(userdata?.gender || "");
-              setBirthday(userdata?.birthday || "");
-            }}
             className="px-4 py-1 border border-primary text-sm rounded-full mt-5 hover:bg-blue-700 hover:text-white transition-all"
+            onClick={() => setShowPasswordChange(!showPasswordChange)}
           >
-            Edit
+            Change Password
           </button>
+        </div>
 
-        )}
-        <button
-          className=" px-4 py-1 border border-primary text-sm rounded-full mt-5 hover:bg-blue-700 hover:text-white transition-all"
-          onClick={() => setShowPasswordChange(!showPasswordChange)}
-        >
-          Change Password
-
+        <button onClick={deletehadeler} className="px-4 py-1 mt-5">
+          <img className="w-4 h-5" src={assets.delete1} alt="Delete" />
         </button>
-
       </div>
+
+
 
       {showPasswordChange && (
         <div className="mt-6 border-t border-gray-300 pt-4">

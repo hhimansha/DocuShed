@@ -1,4 +1,5 @@
 import express from "express";
+
 import { allDoctors, checktoken, getUserData, login, logout, register, resetpassword, sendResetOtp, updateProfile, userRestPassword, verifyResetOtp } from "../controllers/userController.js";
 // import { getUsers } from "../controllers/userController";
 import userAuth from "../Middleware/userAutj.js";
@@ -21,7 +22,7 @@ authrouter.post('/verifyResetOtp',verifyResetOtp);
 authrouter.post('/update-profile',upload.single('image'),userAuth,updateProfile)
 authrouter.post('/user-rest-password',userAuth,userRestPassword);
 authrouter.get('/allpatient',userAuth,allpatient);
-
+authrouter.delete('/delete-user',userAuth,deleteUserAccount);
 
 
 

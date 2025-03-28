@@ -139,12 +139,12 @@ const ResetPassword = () => {
       }
       
       {otpsubmit && isemailsent &&
-       <form onSubmit={onsubmitnewpassword} className='bg-slate-900 p-8 rounded-lg shadow-lg w-96 text-sm'>
-       <h1 className='text-white text-2xl font-semibold text-center mb-4'>New password</h1>
+       <form onSubmit={onsubmitnewpassword} className='bg-white p-8 rounded-lg shadow-lg w-96 text-sm border-2 border-black'>
+       <h1 className='text-black text-2xl font-semibold text-center mb-4'>New password</h1>
        <p className='text-center mb-6 text-indigo-300'>Enter new password below</p>
-       <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full bg-[#333A5C]'>
-         <img src={assets.lock_icon} alt="" className='w-3 h-3' />
-         <input type="password" placeholder='password ' className='bg-transparent outline-none text-white' value={newPassword} onChange={e => setNewpassword(e.target.value)} required />
+       <div className='mb-4 flex items-center gap-3 w-full px-5 py-2.5 rounded-full '>
+         
+         <input type="password" placeholder='password ' className='border border-gray-300 rounded w-full p-3 mt-1 focus:outline-none focus:ring-2 focus:ring-indigo-400' value={newPassword} onChange={e => setNewpassword(e.target.value)} required />
     
        </div>
        <button className='w-full py-2.5 bg-gradient-to-r from-indigo-500 to-indigo-900 text-white rounded-full mt-3'>Submit</button>
