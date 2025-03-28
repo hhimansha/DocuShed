@@ -7,20 +7,25 @@ import Home from './pages/Home';
 import Doctors from './pages/Doctors';
 import Login from './pages/Login';
 import About from './pages/About';
-import Context from './pages/Context';
+import Contact from './pages/Contact';
 import Myprofile from './pages/Myprofile';
-import MyApointment from './pages/MyApointment';
+import MyAppointment from './pages/MyAppointment';
 import Appointment from './pages/Appointment';
 import Navbar from './Components/Navbar';
-import Fotter from './Components/fotter';
+import Footer from './components/Footer';
 import Navadmin from './components/Navadmin';
 import Admindashbord from './pages/Admindashbord';
 import Navsidebar from './components/Navsidebar';
-import Dasgbord from './pages/Admin/Dasgbord';
+import Dasgbord from './pages/Admin/Dashbord';
 import AllAppointment from './pages/Admin/AllAppointment';
 import AddDoctor from './pages/Admin/AddDoctor';
 import DoctorsList from './pages/Admin/DoctorsList';
 import ResetPassword from './pages/ResetPassword';
+import Verify from './pages/Verify'
+import DoctorAppointments from './pages/Doctor/DoctorAppointments';
+import DoctorDashboard from './pages/Doctor/DoctorDashboard';
+import DoctorProfile from './pages/Doctor/DoctorProfile';
+
 
 const App = () => {
   const location = useLocation();
@@ -47,6 +52,9 @@ const App = () => {
                 <Route path='/admin/all-appointment' element={<AllAppointment />} />
                 <Route path='/admin/addDoctor' element={<AddDoctor />} />
                 <Route path='/admin/DoctorsList' element={<DoctorsList />} />
+                <Route path='/admin/doctor-dashboard' element={<DoctorDashboard />} />
+                <Route path='/admin/doctor-appointments' element={<DoctorAppointments />} />
+                <Route path='/admin/doctor-profile' element={<DoctorProfile />} />
               </Routes>
             </div>
           </div>
@@ -61,17 +69,17 @@ const App = () => {
           <Route path='/doctors/:speciality' element={<Doctors />} />
           <Route path='/login' element={<Login />} />
           <Route path='/about' element={<About />} />
-          <Route path='/contact' element={<Context />} />
-          <Route path='/my-profile' element={<Myprofile />} />
-          <Route path='/my-appointments' element={<MyApointment />} />
+          <Route path='/contact' element={<Contact />} />
           <Route path='/appointment/:docId' element={<Appointment />} />
-          <Route path='/reset-password' element={<ResetPassword />} />
-          
+          <Route path='/my-appointments' element={<MyAppointment />} />
+          <Route path='/my-profile' element={<Myprofile />} />         
+          <Route path='/verify' element={<Verify />} />
+          <Route path='/reset-password' element={<ResetPassword />} />   
         </Routes>
         
       )}
 
-{!isAdminRoute && <Fotter />}
+{!isAdminRoute && <Footer />}
     </div>
   );
 };
