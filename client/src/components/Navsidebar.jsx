@@ -47,6 +47,18 @@ const Navsidebar = () => {
           </NavLink>
 
           <NavLink
+            to="/admin/PatientList"
+            className={({ isActive }) =>
+              `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
+                isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''
+              }`
+            }
+          >
+            <img src={assets.patient1} className='w-8 h-8' alt="Doctors List Icon" />
+            <p className='text-[#515151]'>patients List</p>
+          </NavLink>
+
+          <NavLink
             to="/admin/DoctorsList"
             className={({ isActive }) =>
               `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
@@ -57,9 +69,59 @@ const Navsidebar = () => {
             <img src={assets.people_icon} alt="Doctors List Icon" />
             <p className='text-[#515151]'>Doctors List</p>
           </NavLink>
+
+
+        </div>
+      )}
+
+
+
+
+       <div className='min-h-screen bg-white border-r'>
+      {userdata.role === "doctor" && (
+        <div className='mt-5'>
+          <NavLink
+            to="/doctordash"
+            className={({ isActive }) =>
+              `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
+                isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''
+              }`
+            }
+          >
+            <img src={assets.home_icon} alt="Home Icon" />
+            <p className='text-[#515151]'>Dashboard</p>
+          </NavLink>
+
+          <NavLink
+            to="/doctordash-appointment"
+            className={({ isActive }) =>
+              `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
+                isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''
+              }`
+            }
+          >
+            <img src={assets.appointment_icon} alt="Appointments Icon" />
+            <p className='text-[#515151]'>Appointments</p>
+          </NavLink>
+
+         
+
+          <NavLink
+            to="/doctordash-profile"
+            className={({ isActive }) =>
+              `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
+                isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''
+              }`
+            }
+          >
+            <img src={assets.people_icon} alt="Doctors List Icon" />
+            <p className='text-[#515151]'>Profile</p>
+          </NavLink>
         </div>
       )}
     </div>
+    </div>
+
   );
 };
 

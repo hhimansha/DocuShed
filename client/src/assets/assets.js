@@ -38,7 +38,10 @@ import Neurologist from './Neurologist.svg'
 import Pediatricians from './Pediatricians.svg'
 import mail_icon from './mail_icon.svg'
 import lock_icon from './lock_icon.svg'
-
+import upload_area from './upload_area.png'
+import upload from './upload.png'
+import delete1 from './delete.png'
+import patient from './patient.png'
 
 export const assets = {
     appointment_img,
@@ -59,7 +62,10 @@ export const assets = {
     stripe_logo,
     razorpay_logo,
     mail_icon,
-    lock_icon
+    lock_icon,
+    upload_area,
+    upload,delete1,
+    patient
 
 }
 

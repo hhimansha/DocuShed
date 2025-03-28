@@ -29,7 +29,7 @@ const Appointment = () => {
       return;
     }
     if (userdata) {
-      navigate('/getappointment');
+      //navigate('/getappointment');
     } else {
       toast.error('Please login first!');
       navigate('/login');

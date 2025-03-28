@@ -1,8 +1,12 @@
+import { assets } from '@/assets/assets';
 import { AppContext } from '@/Context/AppContext'
 import React, { useContext, useEffect, useState } from 'react'
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 
 const DoctorsList = () => {
-  const { gealldoctos, Doctors, userdata, changeAvailability } = useContext(AppContext);
+  const { gealldoctos, Doctors, userdata, changeAvailability,deletedoctor } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
@@ -16,6 +20,42 @@ const DoctorsList = () => {
     item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     item.speciality.toLowerCase().includes(searchTerm.toLowerCase())
   );
+
+
+  const handleDelete = (doctorId) => {
+    toast.warn(
+      <div>
+        <p>Are you sure you want to delete this doctor?</p>
+        <div className="flex gap-3 mt-2">
+          <button
+            onClick={() => {
+              deletedoctor(doctorId);
+              toast.dismiss();
+             
+            }}
+            className="bg-red-500 text-white px-3 py-1 rounded"
+          >
+            Yes
+          </button>
+          <button
+            onClick={() => toast.dismiss()}
+            className="bg-gray-500 text-white px-3 py-1 rounded"
+          >
+            No
+          </button>
+        </div>
+      </div>,
+      {
+        position: "top-right",
+        autoClose: false,
+        closeOnClick: false,
+        draggable: false,
+        closeButton: false
+      }
+    );
+  };
+  
+
 
   return (
     <div className='m-5 max-h-[90vh] overflow-scroll'>
@@ -38,10 +78,23 @@ const DoctorsList = () => {
               <div className='p-4'>
                 <p className='text-neutral-800 text-lg font-medium'>{item.name}</p>
                 <p className='text-zinc-600 text-sm'>{item.speciality}</p>
-                <div className='mt-2 flex items-center gap-1 text-sm'>
-                  <input onChange={() => changeAvailability(item._id)} type="checkbox" checked={item.available} />
-                  <p>Available</p>
+                <div className="mt-2 flex items-center justify-between text-sm">
+                  {/* Left side: Checkbox & Text */}
+                  <div className="flex items-center gap-2">
+                    <input onChange={() => changeAvailability(item._id)} type="checkbox" checked={item.available} />
+                    <p>Available</p>
+                  </div>
+
+                  {/* Right side: Delete Button */}
+                  <button
+                    onClick={() => handleDelete(item._id)}
+                    className="flex items-center justify-center p-2 rounded-full"
+                  >
+                    <img src={assets.delete1} className="w-4 h-4" alt="Delete" />
+                  </button>
                 </div>
+
+
               </div>
             </div>
           ))

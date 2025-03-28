@@ -21,17 +21,23 @@ import AllAppointment from './pages/Admin/AllAppointment';
 import AddDoctor from './pages/Admin/AddDoctor';
 import DoctorsList from './pages/Admin/DoctorsList';
 import ResetPassword from './pages/ResetPassword';
+import Doctordashbord from './pages/Doctor/Doctordashbord';
+
+import DoctorAppointment from './pages/Doctor/DoctorAppointment';
+import Doctorprofile from './pages/Doctor/Doctorprofile';
+import PatientList from './pages/Admin/PatientList';
 
 const App = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
+  const isDoctorRoute = location.pathname.startsWith('/doctordash');
 
   return (
-    <div className={isAdminRoute ? '' : 'mx-4 sm:mx-[10%]'}>
+    <div className={!isAdminRoute && !isDoctorRoute ? 'mx-4 sm:mx-[10%]' : ''}>
       <ToastContainer position="top-right" autoClose={2000} />
 
-      {/* Show Navbar only if not admin route */}
-      {!isAdminRoute && <Navbar />}
+      {/* Show Navbar only if not admin or doctor route */}
+      {!isAdminRoute && !isDoctorRoute && <Navbar />}
 
       {/* Show AdminNav and Navsidebar only if admin route */}
       {isAdminRoute && (
@@ -47,6 +53,7 @@ const App = () => {
                 <Route path='/admin/all-appointment' element={<AllAppointment />} />
                 <Route path='/admin/addDoctor' element={<AddDoctor />} />
                 <Route path='/admin/DoctorsList' element={<DoctorsList />} />
+                <Route path='/admin/PatientList' element={<PatientList/>}/>
               </Routes>
             </div>
           </div>
@@ -54,7 +61,7 @@ const App = () => {
       )}
 
       {/* General Routes */}
-      {!isAdminRoute && (
+      {!isAdminRoute && !isDoctorRoute && (
         <Routes>
           <Route path='/' element={<Home />} />
           <Route path='/doctors' element={<Doctors />} />
@@ -66,12 +73,31 @@ const App = () => {
           <Route path='/my-appointments' element={<MyApointment />} />
           <Route path='/appointment/:docId' element={<Appointment />} />
           <Route path='/reset-password' element={<ResetPassword />} />
-          
+          {/* Fallback route */}
+          <Route path='*' element={<Home />} />
         </Routes>
-        
       )}
 
-{!isAdminRoute && <Fotter />}
+      {/* Show AdminNav and Navsidebar only if doctor route */}
+      {isDoctorRoute && (
+        <div>
+          <Navadmin />
+          <div className='flex items-start'>
+            <Navsidebar />
+            <div className="flex-1">
+              <Routes>
+                {/* Doctor routes inside sidebar layout */}
+                <Route path='/doctordash' element={<Doctordashbord />} />
+                <Route path='/doctordash-appointment' element={<DoctorAppointment />} />
+                <Route path='/doctordash-profile' element={<Doctorprofile />} />
+              </Routes>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Show footer only if it's not admin or doctor route */}
+      {!isAdminRoute && !isDoctorRoute && <Fotter />}
     </div>
   );
 };

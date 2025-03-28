@@ -5,6 +5,7 @@ import transporter from '../config/nodemailer.js';
 import { Email_very_template } from '../config/Emailtemplate.js';
 import validator from "validator";
 import Doctor from '../models/doctorModel.js';
+import {v2 as cloudinary}from 'cloudinary'
 //import { Email_very_template } from '../config/Emailtemplate.js';
 
 export const register = async (req, res) => {
@@ -40,7 +41,7 @@ export const register = async (req, res) => {
         const user = new userModel({ name, email, password: hashPassword });
         await user.save();
 
-        const token =jwt.sign({id:user._id,role:user.role},process.env.JWT_SECRET,({expiresIn:'7d'}));
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, ({ expiresIn: '7d' }));
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -50,11 +51,11 @@ export const register = async (req, res) => {
         });
 
         //sending welcome email
-        const mailOption={
-            from:process.env.SENDER_EMAIL,
+        const mailOption = {
+            from: process.env.SENDER_EMAIL,
             to: email,
-            subject:'Welcome to pizza hut ',
-            text:`Welcome to Prescripto: ${email}`
+            subject: 'Welcome to pizza hut ',
+            text: `Welcome to Prescripto: ${email}`
         }
 
         await transporter.sendMail(mailOption);
@@ -65,7 +66,7 @@ export const register = async (req, res) => {
     } catch (error) {
         console.error('Error registering user:', error);
         return res.status(500).json({ success: false, message: 'Server Error', error });
-    } 
+    }
 
 };
 
@@ -94,7 +95,7 @@ export const login = async (req, res) => {
 
 
 
-        const token = jwt.sign({ id: user._id,role:user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
+        const token = jwt.sign({ id: user._id, role: user.role }, process.env.JWT_SECRET, { expiresIn: '7d' });
 
         res.cookie('token', token, {
             httpOnly: true,
@@ -103,17 +104,17 @@ export const login = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000
         })
 
-        return res.status(200).json({ 
-            status: 'success', 
+        return res.status(200).json({
+            status: 'success',
             message: 'login sucess',
-            userId: user._id, 
-            role: user.role, 
-           
-            isAdmin: user.role === 'admin', 
-            isStaff: user.role === 'doctor' 
+            userId: user._id,
+            role: user.role,
+
+            isAdmin: user.role === 'admin',
+            isStaff: user.role === 'doctor'
         });
-        
-      
+
+
     } catch (error) {
         return res.json({ success: false, message: error.message })
     }
@@ -129,126 +130,128 @@ export const checktoken = async (req, res) => {
     }
 };
 
- 
-
-  
 
 
-export const logout = async(req,res)=>{
+
+
+
+export const logout = async (req, res) => {
 
     try {
-  
-      res.clearCookie('token',{
-          httpOnly: true,
-          secure: process.env.NODE_ENV === 'production',
-          sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
-        
-      })
-      
-      return res.json({success:true,message:'logout'});
-  
-  
-  
-  
-      
+
+        res.clearCookie('token', {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === 'production',
+            sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
+
+        })
+
+        return res.json({ success: true, message: 'logout' });
+
+
+
+
+
     } catch (error) {
-      return res.json({ success: false, message: error.message })
+        return res.json({ success: false, message: error.message })
     }
-  
-  
-  }
 
-  export const getUserData =async(req,res)=>{
+
+}
+
+export const getUserData = async (req, res) => {
     try {
 
-      const {userId,role }=req.body;
+        const { userId, role } = req.body;
 
-      const user = await userModel.findById(userId);
+        const user = await userModel.findById(userId);
 
-      if(!user){
-        res.json({success:false,message :'user not found'});
-      }
-      
-    
+        if (!user) {
+            res.json({ success: false, message: 'user not found' });
+        }
+
+
         res.json({
-            success:true,
-            userData:{
-            name:user.name,
-            role:user.role,
-            image:user.image,
-            name:user.name,
-            email:user.email,
-            isAccountVerified:user.isAccountVerified
-           
-           }
-           
-           });
-    
-     
-      
+            success: true,
+            userData: {
+                name: user.name,
+                role: user.role,
+                image: user.image,
+                email: user.email,
+                phone: user.phone,
+                gender: user.gender,
+                address: user.address || { line1: '', line2: '' }, // Handle if address is undefined
+                isAccountVerified: user.isAccountVerified
+            }
+        });
+        
+        
+
+
+
     } catch (error) {
-      res.json({success:false,message :error.message});
+        res.json({ success: false, message: error.message });
     }
 }
 
 export const allDoctors = async (req, res) => {
     try {
-      const doctors = await Doctor.find({}).select(['-password','-email']);
-      res.json({ success: true, doctors });  // lowercase
+        const doctors = await Doctor.find({}).select(['-password', '-email']);
+        res.json({ success: true, doctors });  // lowercase
     } catch (error) {
-      res.status(500).json({ success: false, message: "Server Error", error });
+        res.status(500).json({ success: false, message: "Server Error", error });
     }
-  };
-  
+};
 
 
-  export const sendResetOtp = async (req,res)=>{
-    const {email}=req.body;
-    if(!email){
-        return res.json({success:false,message:'Email is required'})
+
+export const sendResetOtp = async (req, res) => {
+    const { email } = req.body;
+    if (!email) {
+        return res.json({ success: false, message: 'Email is required' })
     }
     try {
-        const user =await userModel.findOne({email});
-        if(!user){
-            return res.json({success:false,message:'User not found'})
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.json({ success: false, message: 'User not found' })
         }
 
-        const otp= String(Math.floor(100000+Math.random()*900000))  //0.123456*900000=111,110.4+100000=211,110.4=211110 6bit otp
+        const otp = String(Math.floor(100000 + Math.random() * 900000))  //0.123456*900000=111,110.4+100000=211,110.4=211110 6bit otp
 
-      user.resetOtp=otp;
-      user.resetOtpExpireAt=Date.now() + 15 * 60 * 1000
+        user.resetOtp = otp;
+        user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000
 
-      await user.save();
+        await user.save();
 
-      const mailOption={
-        from:process.env.SENDER_EMAIL,
-        to:user.email,
-        subject:'password rest  otp ',
-        html:Email_very_template.replace("{{otp}}",otp)
-    };
+        const mailOption = {
+            from: process.env.SENDER_EMAIL,
+            to: user.email,
+            subject: 'password rest  otp ',
+            html: Email_very_template.replace("{{otp}}", otp)
+        };
 
-    await transporter.sendMail(mailOption);
+        await transporter.sendMail(mailOption);
 
-    return res.json({success: true, message:'OTP sent to your email'});
+        return res.json({ success: true, message: 'OTP sent to your email' });
 
     } catch (error) {
-        return res.json({success:false,message:error.message})
+        return res.json({ success: false, message: error.message })
     }
 }
 
-export const resetpassword = async (req,res)=>{
-    const {email,otp,newPassword} = req.body
+export const resetpassword = async (req, res) => {
+    const { email, otp, newPassword } = req.body
 
-    if(!email || !otp || !newPassword ){
-        return res.json({success:false,message:'Email ,OTP,and new password are required'})
+    if (!email || !otp || !newPassword) {
+        return res.json({ success: false, message: 'Email ,OTP,and new password are required' })
     }
     try {
-        const user = await userModel.findOne({email});
-        if(!user){
-            return res.json({success:false,message:'user not found'})
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.json({ success: false, message: 'user not found' })
         }
-        if(user.resetOtp === "" || user.resetOtp !== otp){
-            return res.status(400).json({success:false,message:"Invalid OTP"});
+        if (user.resetOtp === "" || user.resetOtp !== otp) {
+            return res.status(400).json({ success: false, message: "Invalid OTP" });
         }
 
         if (newPassword.length < 8) {
@@ -256,23 +259,23 @@ export const resetpassword = async (req,res)=>{
         }
 
 
-        if(user.resetOtpExpireAt< Date.now()){
-            return res.status(400).json({success:false,message:'OTP expired'})
+        if (user.resetOtpExpireAt < Date.now()) {
+            return res.status(400).json({ success: false, message: 'OTP expired' })
         }
 
-        const hashpassword = await bcrypt.hash(newPassword,10);
+        const hashpassword = await bcrypt.hash(newPassword, 10);
 
-        user.password=hashpassword;
-        user.resetOtp='';
-        user.resetOtpExpireAt =0;
+        user.password = hashpassword;
+        user.resetOtp = '';
+        user.resetOtpExpireAt = 0;
 
         await user.save();
-         
-        return res.status(200).json({success:true,message:'password hash been reset successfully'});
 
-        
+        return res.status(200).json({ success: true, message: 'password hash been reset successfully' });
+
+
     } catch (error) {
-        return res.status(400).json({success:false,message:error.message})
+        return res.status(400).json({ success: false, message: error.message })
     }
 }
 
@@ -301,3 +304,79 @@ export const verifyResetOtp = async (req, res) => {
         return res.json({ success: false, message: error.message });
     }
 };
+// API to update user profile
+
+export const updateProfile = async (req, res) => {
+    try {
+        const { userId, name, phone, address, gender } = req.body;
+        const imageFile = req.file;
+
+        if (!name || !phone || !gender) {
+            return res.json({ success: false, message: "Data missing" });
+        }
+
+        await userModel.findByIdAndUpdate(userId, { name, phone, address: JSON.parse(address), gender });
+
+        if (imageFile) {
+            // Upload image to Cloudinary
+            const imageUpload = await cloudinary.uploader.upload(imageFile.path, { resource_type: 'image' });
+            const imageUrl = imageUpload.secure_url; // ✅ Fixed issue here
+            await userModel.findByIdAndUpdate(userId, { image: imageUrl });
+        }
+
+        res.json({ success: true, message: "Profile updated successfully" });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+};
+
+ // Assuming the path to your user model
+
+export const userRestPassword = async (req, res) => {
+  const { userId, currentPassword, newPassword } = req.body;
+
+  // Validation
+  if (!currentPassword || !newPassword) {
+    return res.json({ success: false, message: "Data missing" });
+  }
+
+  try {
+    // Find user by ID
+    const user = await userModel.findById(userId);
+
+    if (!user) {
+      return res.json({ success: false, message: "No user available" });
+    }
+
+    // Check if current password matches
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+
+    if (!isMatch) {
+      return res.json({ success: false, message: "Current password invalid" });
+    }
+
+    // Validate new password strength
+    if (newPassword.length < 8) {
+      return res.status(400).json({ success: false, message: "Please enter a strong password (min 8 characters)" });
+    }
+
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashPassword = await bcrypt.hash(newPassword, salt);
+
+   
+    user.password = hashPassword;
+    await user.save();
+
+    
+    return res.json({ success: true, message: "Password updated successfully" });
+
+  } catch (error) {
+    console.error(error);
+    return res.status(500).json({ success: false, message: "An error occurred" });
+  }
+};
+
+
+
