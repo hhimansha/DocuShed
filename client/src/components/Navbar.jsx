@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react'
 import axios from 'axios'
 import { assets } from '../assets/assets'
 import { NavLink, useNavigate } from 'react-router-dom'
-import { AppContext } from '@/Context/AppContext';
+import { AppContext } from '@/Context/AdminAppContext';
 
 const Navbar = () => {
     const navigate = useNavigate();

@@ -2,7 +2,7 @@ import React, { useEffect } from 'react'
 import { assets } from '../../assets/assets'
 import { useContext } from 'react'
 import { AdminContext } from '../../context/AdminContext'
-import { AppContext } from '../../context/AppContext'
+import { AppContext } from '../../Context/AdminAppContext'
 
 const AllAppointments = () => {
 

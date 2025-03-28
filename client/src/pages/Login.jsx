@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-import { AppContext } from '@/Context/AppContext';
+import { AppContext } from '@/Context/AdminAppContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 

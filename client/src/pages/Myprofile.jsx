@@ -1,7 +1,7 @@
 //import React from 'react';
 import React, { useContext, useEffect, useState } from 'react'
 
-import { AppContext } from '../Context/AppContext'
+import { AppContext } from '../Context/AdminAppContext'
 import { assets } from '@/assets/assets_admin/assets';
 const MyProfile = () => {
       const { userdata } = useContext(AppContext) 

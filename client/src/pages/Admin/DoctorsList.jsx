@@ -1,4 +1,4 @@
-import { AppContext } from '@/Context/AppContext'
+import { AppContext } from '@/Context/AdminAppContext'
 import React, { useContext, useEffect, useState } from 'react'
 
 const DoctorsList = () => {

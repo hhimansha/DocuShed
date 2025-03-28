@@ -1,7 +1,7 @@
 import React from 'react'
 import { assets } from '@/assets/assets_admin/assets'
 import { useContext ,useState} from 'react'
-import { AppContext } from '@/Context/AppContext'
+import { AppContext } from '@/Context/AdminAppContext'
 import { useNavigate } from 'react-router-dom'
 import axios from 'axios';
 

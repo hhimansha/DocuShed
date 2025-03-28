@@ -5,7 +5,7 @@ import './index.css'
 import { BrowserRouter } from 'react-router-dom'
 import AdminContextProvider from './context/AdminContext.jsx'
 import DoctorContextProvider from './context/DoctorContext.jsx'
-import AppContextProvider from './Context/AppContext.jsx'
+import AppContextProvider from './Context/AdminAppContext.jsx'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <BrowserRouter>
