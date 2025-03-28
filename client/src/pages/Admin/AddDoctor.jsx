@@ -57,7 +57,7 @@ const AddDoctor = () => {
         setAddress1('')
         setAddress2('')
         setDegree('')
-        //setAbout('')
+        setAbout('')
         setFees('')
         setExperience('')
       } else {

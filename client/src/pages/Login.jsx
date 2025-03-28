@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { AppContext } from '@/Context/AppContext';
 import { ToastContainer, toast } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
+import Swal from 'sweetalert2';
 
 const Login = () => {
   const { backendUrl, setIslogin, getuser } = useContext(AppContext);
@@ -19,60 +20,82 @@ const Login = () => {
     event.preventDefault();
 
     try {
-      if (state === 'Login') {
-        const { data } = await axios.post('http://localhost:5000/api/auth/login', {
-          email: Email,
-          password: Password
-        }, {
-          withCredentials: true
-        });
+        if (state === 'Login') {
+            const { data } = await axios.post('http://localhost:5000/api/auth/login', {
+                email: Email,
+                password: Password
+            }, {
+                withCredentials: true
+            });
 
-        console.log(data); // Debugging
+            console.log(data); // Debugging
 
-        if (data.status === 'success') {
-          const { isAdmin, isStaff } = data;
+            if (data.status === 'success') {
+                const { isAdmin, isStaff } = data;
 
-          // Call once
-          await getuser();
-          setIslogin(true);
+                // Call once
+                await getuser();
+                setIslogin(true);
 
-          // Role-based redirect
-          if (isAdmin) {
-            toast.success("Admin Login Success");
-            await getuser();
-            setIslogin(true);
-            navigate('/admin/dashbord');
-            window.location.href = '/admin/dashbord'; // Full page reload without setTimeout
+                // Role-based redirect with SweetAlert2
+                if (isAdmin) {
+                    Swal.fire({
+                        title: 'Admin Login Success!',
+                        text: 'Redirecting to Admin Dashboard...',
+                        icon: 'success',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '/admin/dashbord';
+                    });
 
-          } else if (isStaff) {
-            await getuser();
-            setIslogin(true);
-            toast.success("Doctor Login Success");
-            navigate('/doctordash');
-            window.location.href = '/doctordash';
-          } else {
-            toast.success("Login Success");
-            navigate('/');
-          }
+                } else if (isStaff) {
+                    Swal.fire({
+                        title: 'Doctor Login Success!',
+                        text: 'Redirecting to Doctor Dashboard...',
+                        icon: 'success',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '/doctordash';
+                    });
+
+                } else {
+                    Swal.fire({
+                        title: 'Login Successful!',
+                        text: 'Redirecting to Home...',
+                        icon: 'success',
+                        confirmButtonColor: '#3085d6',
+                        confirmButtonText: 'OK'
+                    }).then(() => {
+                        window.location.href = '/';
+                    });
+                }
+            }
+
+        } else {
+            // Sign up logic with Toast
+            const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
+                name: Name,
+                email: Email,
+                password: Password
+            });
+
+            if (data.success === true) {
+                toast.success("Account Created! Please Login");
+                setState('Login');
+            }
         }
-
-      } else {
-        // Sign up logic
-        const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
-          name: Name,
-          email: Email,
-          password: Password
-        });
-
-        if (data.success === true) {
-          toast.success("Account Created! Please Login");
-          setState('Login');
-        }
-      }
     } catch (error) {
-      toast.error(error.response?.data?.message || "Something went wrong!");
+        Swal.fire({
+            title: 'Error!',
+            text: error.response?.data?.message || "Something went wrong!",
+            icon: 'error',
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'Try Again'
+        });
     }
-  };
+};
 
 
 
