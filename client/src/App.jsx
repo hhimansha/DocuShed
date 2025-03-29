@@ -26,6 +26,9 @@ import Doctordashbord from './pages/Doctor/Doctordashbord';
 import DoctorAppointment from './pages/Doctor/DoctorAppointment';
 import Doctorprofile from './pages/Doctor/Doctorprofile';
 import PatientList from './pages/Admin/PatientList';
+import AppointmentConfirmation from './pages/payment/AppointmentConfirmation';
+import PaymentSuccess from './pages/payment/PaymentSuccess';
+import PaymentCancel from './pages/payment/PaymentCancel';
 
 const App = () => {
   const location = useLocation();
@@ -75,6 +78,9 @@ const App = () => {
           <Route path='/reset-password' element={<ResetPassword />} />
           {/* Fallback route */}
           <Route path='*' element={<Home />} />
+          <Route path='/appointment-confirm' element={<AppointmentConfirmation />} />
+          <Route path='/payment-success' element={<PaymentSuccess />} />
+          <Route path='/payment-cancel' element={<PaymentCancel />} />
         </Routes>
       )}
 
