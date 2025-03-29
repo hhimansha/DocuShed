@@ -78,6 +78,13 @@ export const initiatePayment = async (req, res) => {
         .digest('hex')
         .toUpperCase();
   
+      // Debug logs (remove in production)
+      console.log('Hash Generation Debug:');
+      console.log('Step 1 - Merchant Secret:', PAYHERE_CONFIG.MERCHANT_SECRET);
+      console.log('Step 2 - Inner MD5:', innerHash);
+      console.log('Step 3 - Final Hash String:', hashString);
+      console.log('Step 4 - Final Hash:', paymentData.hash);
+  
       res.status(200).json({
         success: true,
         paymentData,
