@@ -19,6 +19,13 @@ const AppContextProvider = (props) => {
   const [patient,setpatints]=useState([])
   const currencysymbol = '$';
 
+//chatapp
+  const [input ,setinput]=useState("")
+  const [resendPromt ,setRecentPromt] =useState("")
+  const [prevPromts,SetPreviosPromts]=useState([])
+  const [showResult,setShowResult]=useState(false)
+  const [resultData,setResultData]=useState("")
+
   // Fetch all doctors
   const gealldoctos = async () => {
     try {
@@ -174,6 +181,73 @@ const AppContextProvider = (props) => {
 
   }
 
+  const delayPara = (indext,nextword)=>{
+      setTimeout(function(params){
+          setResultData(prev =>prev+nextword);
+      },20*indext)
+  }
+
+  const newchat  =()=>{
+    setIslogin(false)
+    setShowResult(false)
+  }
+
+  const onsent = async (prompt) => {
+    const userInput = prompt || input; // Use `prompt` if available, otherwise fallback to `input`
+    
+    if (!userInput) {
+      toast.error("Please enter a prompt.");
+      return;
+    }
+  
+    try {
+      setResultData(""); // ✅ Clear previous result before new request
+      setLoading(true);
+      setShowResult(true);
+      setinput(""); // ✅ Clear input immediately to avoid old message display
+  
+      // ✅ Update previous prompts before making the request
+      SetPreviosPromts(prev => [...prev, userInput]);
+      setRecentPromt(userInput);
+  
+      // ✅ Send API request
+      let response = await axios.post(
+        `${backendUrl}/api/ai/generate/`,
+        { prompt: userInput },
+        { withCredentials: true }
+      );
+  
+      console.log("API Response:", response);
+  
+      const output = response?.data?.text;
+      if (!output) {
+        throw new Error("Response text is missing.");
+      }
+  
+      let responseArray = output.split("**");  
+      let newResponse = responseArray.map((chunk, i) =>
+        i % 2 === 1 ? `<b>${chunk}</b>` : chunk
+      ).join("");
+  
+      let formattedResponse = newResponse.replace(/\*/g, "</br>");
+      
+      let newResponseArry = formattedResponse.split(" ");
+      newResponseArry.forEach((word, i) => delayPara(i, word + " "));
+  
+      setLoading(false);
+    } catch (error) {
+      console.error("Error during request:", error);
+      toast.error("Error during AI generation.");
+    }
+  };
+  
+ 
+ 
+
+
+
+
+
   const value = {
     
     currencysymbol,
@@ -193,7 +267,10 @@ const AppContextProvider = (props) => {
     available,
     dashData,getdahdata,
     getdoctorprofiledata,profileDta,setProfileData,
-    setpatints,patient,geallpatints,deletePatient,deletedoctor
+    setpatints,patient,geallpatints,deletePatient,deletedoctor,
+    prevPromts,
+    SetPreviosPromts,
+    onsent,setRecentPromt,resendPromt,showResult,resultData,input,setinput,newchat
   };
 
   return (
