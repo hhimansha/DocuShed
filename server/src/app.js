@@ -6,6 +6,8 @@ import cookieParser from "cookie-parser";
 import adminRouter from "./routes/AdminRoutes.js";
 import authrouter  from "./routes/userRoutes.js"
 import doctorRouter from "./routes/DoctorRoute.js";
+import chatbotrouter from "./routes/chatbotrouter.js";
+
 // import userRoutes from "./routes/userRoutes";
 
 dotenv.config();
@@ -24,6 +26,7 @@ app.get('/',(req,res)=>res.send("API working fine"));
  app.use("/api/admin", adminRouter)
  app.use("/api/auth",authrouter)
  app.use("/api/doctor",doctorRouter)
+ app.use('/api/ai',chatbotrouter)
  
  
 export default app;
