@@ -7,6 +7,7 @@ import adminRouter from "./routes/AdminRoutes.js";
 import authrouter  from "./routes/userRoutes.js"
 import doctorRouter from "./routes/DoctorRoute.js";
 import chatbotrouter from "./routes/chatbotrouter.js";
+import session from 'express-session';
 
 // import userRoutes from "./routes/userRoutes";
 
@@ -20,6 +21,8 @@ app.use(cookieParser());
 app.use(cors({origin:alloweOrigins,credentials:true}))
 
 app.get('/',(req,res)=>res.send("API working fine"));
+
+
 
 
 // Routes

@@ -31,7 +31,7 @@ import Chatbot from './pages/Chatbot';
 const App = () => {
   const location = useLocation();
   const isAdminRoute = location.pathname.startsWith('/admin');
-  const isDoctorRoute = location.pathname.startsWith('/doctordash');
+  const isDoctorRoute = location.pathname.startsWith('/doctordashed');
   const isChatbot = location.pathname.startsWith('/Chatbot');
 
   return (
@@ -69,9 +69,9 @@ const App = () => {
             <Navsidebar />
             <div className="flex-1">
               <Routes>
-                <Route path='/doctordash' element={<Doctordashbord />} />
-                <Route path='/doctordash-appointment' element={<DoctorAppointment />} />
-                <Route path='/doctordash-profile' element={<Doctorprofile />} />
+                <Route path='/doctordashed' element={<Doctordashbord />} />
+                <Route path='/doctordashed-appointment' element={<DoctorAppointment />} />
+                <Route path='/doctordashed-profile' element={<Doctorprofile />} />
               </Routes>
             </div>
           </div>
@@ -96,7 +96,7 @@ const App = () => {
           <Route path='/my-appointments' element={<MyApointment />} />
           <Route path='/appointment/:docId' element={<Appointment />} />
           <Route path='/reset-password' element={<ResetPassword />} />
-          <Route path='*' element={<Home />} />
+        
         </Routes>
       )}
 

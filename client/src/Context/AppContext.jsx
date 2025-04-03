@@ -26,6 +26,9 @@ const AppContextProvider = (props) => {
   const [showResult,setShowResult]=useState(false)
   const [resultData,setResultData]=useState("")
 
+
+  const [Appointments, setAppointments] = useState([]);
+
   // Fetch all doctors
   const gealldoctos = async () => {
     try {
@@ -241,8 +244,72 @@ const AppContextProvider = (props) => {
     }
   };
   
+  const calculateAge = (dob) => {
+    const today = new Date();
+    const birthDate = new Date(dob);
+
+    let age = today.getFullYear() - birthDate.getFullYear();
+    return age;
+};
+
  
- 
+  const getDoctorAppointments = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/doctor/appointments`, { withCredentials: true });
+      if (data.success) {
+        setAppointments(data.appointments);
+        console.log(data.appointments);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const cancelAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/doctor/cancel-appointment`, { appointmentId }, { withCredentials: true });
+      if (data.success) {
+        toast.success(data.message);
+        getDoctorAppointments(); // Refresh appointments
+       
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+
+  const completeAppointment = async (appointmentId) => {
+    try {
+      const { data } = await axios.post(`${backendUrl}/api/doctor/complete-appointment`, { appointmentId }, { withCredentials: true });
+      if (data.success) {
+        toast.success(data.message);
+        getDoctorAppointments();
+       
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
+  
+
+  const getAllAppointments = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/admin/appointments`, { withCredentials: true });
+      if (data.success) {
+        setAppointments(data.appointments.reverse());
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
+    }
+  };
 
 
 
@@ -270,7 +337,8 @@ const AppContextProvider = (props) => {
     setpatints,patient,geallpatints,deletePatient,deletedoctor,
     prevPromts,
     SetPreviosPromts,
-    onsent,setRecentPromt,resendPromt,showResult,resultData,input,setinput,newchat
+    onsent,setRecentPromt,resendPromt,showResult,resultData,input,setinput,newchat,getDoctorAppointments,Appointments,
+    calculateAge,cancelAppointment,completeAppointment,getAllAppointments
   };
 
   return (

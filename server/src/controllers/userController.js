@@ -6,6 +6,7 @@ import { Email_very_template } from '../config/Emailtemplate.js';
 import validator from "validator";
 import Doctor from '../models/doctorModel.js';
 import {v2 as cloudinary}from 'cloudinary'
+import appointment from '../models/appointmentModel.js'
 //import { Email_very_template } from '../config/Emailtemplate.js';
 
 export const register = async (req, res) => {
@@ -407,5 +408,115 @@ export const deleteUserAccount = async (req, res) => {
         return res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
+export const bookAppointment = async (req, res) => {
+
+    try {
+
+        const { userId, docId, slotDate, slotTime } = req.body
+        const docData = await Doctor.findById(docId).select("-password")
+
+       const doctor = await Doctor.findById(docId).select("userId"); 
+const doctorsId = doctor.userId;
+
+
+
+
+        if (!docData.available) {
+            return res.json({ success: false, message: 'Doctor Not Available' })
+        }
+
+        let slots_booked = docData.slots_booked
+
+        // checking for slot availablity 
+        if (slots_booked[slotDate]) {
+            if (slots_booked[slotDate].includes(slotTime)) {
+                return res.json({ success: false, message: 'Slot Not Available' })
+            }
+            else {
+                slots_booked[slotDate].push(slotTime)
+            }
+        } else {
+            slots_booked[slotDate] = []
+            slots_booked[slotDate].push(slotTime)
+        }
+
+        const userData = await userModel.findById(userId).select("-password")
+
+        delete docData.slots_booked
+
+        const appointmentData = {
+            userId,
+            docId,
+            doctorsId,
+            userData,
+            docData,
+            amount: docData.fees,
+            slotTime,
+            slotDate,
+            date: Date.now()
+        }
+
+        const newAppointment = new appointment(appointmentData)
+        await newAppointment.save()
+
+        // save new slots data in docData
+        await Doctor.findByIdAndUpdate(docId, { slots_booked })
+
+        res.json({ success: true, message: 'Appointment Booked' })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+
+}
+export const listAppointment = async (req, res) => {
+    try {
+
+        const { userId } = req.body
+        const appointments = await appointment.find({ userId })
+
+        res.json({ success: true, appointments })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
+
+export const cancelAppointment = async (req, res) => {
+    try {
+
+        const { userId, appointmentId } = req.body
+        const appointmentData = await appointment.findById(appointmentId)
+
+        // verify appointment user 
+        if (appointmentData.userId !== userId) {
+            return res.json({ success: false, message: 'Unauthorized action' })
+        }
+
+        await appointment.findByIdAndUpdate(appointmentId, { cancelled: true })
+
+        // releasing doctor slot 
+        const { docId, slotDate, slotTime } = appointmentData
+
+        const doctorData = await Doctor.findById(docId)
+
+        let slots_booked = doctorData.slots_booked
+
+        slots_booked[slotDate] = slots_booked[slotDate].filter(e => e !== slotTime)
+
+        await Doctor.findByIdAndUpdate(docId, { slots_booked })
+
+        res.json({ success: true, message: 'Appointment Cancelled' })
+
+    } catch (error) {
+        console.log(error)
+        res.json({ success: false, message: error.message })
+    }
+}
+
 
 

@@ -57,7 +57,7 @@ const Login = () => {
                         confirmButtonColor: '#3085d6',
                         confirmButtonText: 'OK'
                     }).then(() => {
-                        window.location.href = '/doctordash';
+                        window.location.href = '/doctordashed';
                     });
 
                 } else {

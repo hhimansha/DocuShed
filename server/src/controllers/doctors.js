@@ -1,5 +1,6 @@
 //change availablity
 
+import appointmentModel from "../models/appointmentModel.js"
 import Doctor from "../models/doctorModel.js"
 
 const changeAvailability = async (req, res) => {
@@ -54,5 +55,62 @@ const updateDoctorProfile = async (req, res) => {
 };
 
 
+const appointmentsDoctor = async (req, res) => {
+  try {
 
-export { changeAvailability, doctorProfile, updateDoctorProfile }
+      const { userId } = req.body
+      const appointments = await appointmentModel.find({ doctorsId:userId })
+
+      res.json({ success: true, appointments })
+
+  } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+  }
+}
+
+const appointmentCancel = async (req, res) => {
+  try {
+
+      const {userId, appointmentId } = req.body
+
+      const appointmentData = await appointmentModel.findById(appointmentId)
+      if (appointmentData && appointmentData.doctorsId === userId) {
+          await appointmentModel.findByIdAndUpdate(appointmentId, { cancelled: true })
+          return res.json({ success: true, message: 'Appointment Cancelled' })
+      }
+
+      res.json({ success: false, message: 'Appointment Cancelled' })
+
+  } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+  }
+
+}
+
+const appointmentComplete = async (req, res) => {
+  try {
+
+      const { userId, appointmentId } = req.body
+
+      const appointmentData = await appointmentModel.findById(appointmentId)
+      if (appointmentData && appointmentData.doctorsId === userId) {
+          await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true })
+          return res.json({ success: true, message: 'Appointment Completed' })
+      }
+
+      res.json({ success: false, message: 'Appointment Cancelled' })
+
+  } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+  }
+
+}
+
+
+
+
+
+export { changeAvailability, doctorProfile, updateDoctorProfile,appointmentsDoctor,appointmentCancel,appointmentComplete }

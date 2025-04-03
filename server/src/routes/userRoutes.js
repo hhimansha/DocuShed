@@ -1,6 +1,6 @@
 import express from "express";
 
-import { allDoctors, checktoken, getUserData, login, logout, register, resetpassword, sendResetOtp, updateProfile, userRestPassword, verifyResetOtp,deleteUserAccount } from "../controllers/userController.js";
+import { allDoctors, checktoken, getUserData, login, logout, register, resetpassword, sendResetOtp, updateProfile, userRestPassword, verifyResetOtp,deleteUserAccount, bookAppointment, listAppointment, cancelAppointment } from "../controllers/userController.js";
 // import { getUsers } from "../controllers/userController";
 import userAuth from "../Middleware/userAutj.js";
 import upload from "../Middleware/multer.js";
@@ -23,6 +23,9 @@ authrouter.post('/update-profile',upload.single('image'),userAuth,updateProfile)
 authrouter.post('/user-rest-password',userAuth,userRestPassword);
 authrouter.get('/allpatient',userAuth,allpatient);
 authrouter.delete('/delete-user',userAuth,deleteUserAccount);
+authrouter.post("/book-appointment", userAuth, bookAppointment)
+authrouter.get("/appointments", userAuth, listAppointment)
+authrouter.post("/cancel-appointment", userAuth, cancelAppointment)
 
 
 
