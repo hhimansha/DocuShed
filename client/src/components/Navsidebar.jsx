@@ -81,7 +81,7 @@ const Navsidebar = () => {
       {userdata.role === "doctor" && (
         <div className='mt-5'>
           <NavLink
-            to="/doctordash"
+            to="/doctordashed"
             className={({ isActive }) =>
               `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
                 isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''
@@ -93,7 +93,7 @@ const Navsidebar = () => {
           </NavLink>
 
           <NavLink
-            to="/doctordash-appointment"
+            to="/doctordashed-appointment"
             className={({ isActive }) =>
               `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
                 isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''
@@ -107,7 +107,7 @@ const Navsidebar = () => {
          
 
           <NavLink
-            to="/doctordash-profile"
+            to="/doctordashed-profile"
             className={({ isActive }) =>
               `flex items-center gap-3 py-3.5 px-3 md:px-9 md:min-w-72 cursor-pointer ${
                 isActive ? 'bg-[#F2F3FF] border-r-4 border-primary' : ''
