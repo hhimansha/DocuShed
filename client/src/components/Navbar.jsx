@@ -62,12 +62,14 @@ const Navbar = () => {
                 >
                     <li className='py-1'>Contact</li>
                 </NavLink>
-                <NavLink
-                    to='/ai'
+                {userdata?<NavLink
+                    to='/Chatbot'
                     className={({ isActive }) => isActive ? 'border-b-2 border-blue-500' : ''}
                 >
                     <li className='py-1'>ASK AI</li>
                 </NavLink>
+                :null}
+                
             </ul>
 
             <div className="flex items-center gap-4">

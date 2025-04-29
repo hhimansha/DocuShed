@@ -3,6 +3,7 @@ import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "../models/userModel.js";
 import Doctor from "../models/doctorModel.js";  // This is correct
+import appointmentModel from "../models/appointmentModel.js";
 //import Doctor from "../models/doctorModel.js";
 
 
@@ -102,11 +103,13 @@ const allDoctors = async (req, res) => {
         const users = await userModel.find({
             role: 'user'
           });
+          const appointment=await appointmentModel.find({});
 
 
           const dashData= {
             doctors: doctors.length,
-            patients:users.length
+            patients:users.length,
+            appointment:appointment.length
           }
 
           res.json({success:true,dashData})
@@ -171,8 +174,24 @@ const patientdelete = async (req, res) => {
     }
 };
 
+const appointmentsAdmin = async (req, res) => {
+  try {
 
-  
+      const appointments = await appointmentModel.find({})
+      res.json({ success: true, appointments })
+
+  } catch (error) {
+      console.log(error)
+      res.json({ success: false, message: error.message })
+  }
+
+}
 
 
-export { addDoctor,allDoctors,admindashbord,allpatient,patientdelete,doctordelete };
+
+
+
+
+
+
+export { addDoctor,allDoctors,admindashbord,allpatient,patientdelete,doctordelete,appointmentsAdmin};

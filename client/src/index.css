@@ -3,7 +3,7 @@
 @plugin "tailwindcss-animate";
 
 @custom-variant dark (&:is(.dark *));
-@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@100..900&display=swap');
+
 
 :root {
   --radius: 0.625rem;
@@ -122,8 +122,9 @@
 }
 
 
-:root {
+#root {
   --color-primary: #5f6FFF;
+
  
   
  

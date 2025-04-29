@@ -23,6 +23,9 @@ authrouter.post('/update-profile',upload.single('image'),userAuth,updateProfile)
 authrouter.post('/user-rest-password',userAuth,userRestPassword);
 authrouter.get('/allpatient',userAuth,allpatient);
 authrouter.delete('/delete-user',userAuth,deleteUserAccount);
+authrouter.post("/book-appointment", userAuth, bookAppointment)
+authrouter.get("/appointments", userAuth, listAppointment)
+authrouter.post("/cancel-appointment", userAuth, cancelAppointment)
 
 
 
