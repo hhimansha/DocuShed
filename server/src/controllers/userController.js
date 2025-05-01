@@ -449,6 +449,8 @@ const doctorsId = doctor.userId;
             userId,
             docId,
             doctorsId,
+            patient: userId, 
+            doctor: docId,
             userData,
             docData,
             amount: docData.fees,
