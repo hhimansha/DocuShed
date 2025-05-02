@@ -15,10 +15,8 @@ const appointmentSchema = new mongoose.Schema({
     cancelled: { type: Boolean, default: false },
     payment: { type: Boolean, default: false },
     isCompleted: { type: Boolean, default: false },
+    meetLink: { type: String }
 
-    startTime: { type: Date },
-    endTime: { type: Date },
-    meetLink: { type: String } 
 })
 
 const appointmentModel = mongoose.models.appointment || mongoose.model("appointment", appointmentSchema)

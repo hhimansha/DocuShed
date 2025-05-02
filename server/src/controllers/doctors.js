@@ -1,9 +1,7 @@
 import appointmentModel from "../models/appointmentModel.js"
 import Doctor from "../models/doctorModel.js"
-import User from "../models/userModel.js"
-import nodemailer from "nodemailer"
-import PDFDocument from "pdfkit"
-import getStream from 'get-stream';
+import nodemailer from '../config/nodemailer.js'
+import { google } from 'googleapis'
 
 const changeAvailability = async (req, res) => {
   try {
@@ -95,81 +93,74 @@ const appointmentComplete = async (req, res) => {
   try {
     const { userId, appointmentId } = req.body;
 
-    const appointment = await appointmentModel.findById(appointmentId)
-      .populate("doctor")
-      .populate("patient");
+    const appointmentData = await appointmentModel.findById(appointmentId).populate('userData');
+    if (appointmentData && appointmentData.doctorsId === userId) {
+      // 1. Create Google Meet link via Google Calendar
+      const oAuth2Client = new google.auth.OAuth2(
+        process.env.GOOGLE_CLIENT_ID,
+        process.env.GOOGLE_CLIENT_SECRET,
+        process.env.GOOGLE_REDIRECT_URI
+      );
+      oAuth2Client.setCredentials({ refresh_token: process.env.GOOGLE_REFRESH_TOKEN });
 
-    if (!appointment || appointment.doctorsId !== userId) {
-      return res.json({ success: false, message: "Invalid or unauthorized" });
+      const calendar = google.calendar({ version: 'v3', auth: oAuth2Client });
+
+      const event = {
+        summary: 'Doctor Appointment',
+        description: 'Online Appointment',
+        start: {
+          dateTime: new Date().toISOString(), // You can use appointmentData.slotDate & slotTime
+          timeZone: 'Asia/Colombo',
+        },
+        end: {
+          dateTime: new Date(Date.now() + 30 * 60000).toISOString(), // 30 min meeting
+          timeZone: 'Asia/Colombo',
+        },
+        conferenceData: {
+          createRequest: { requestId: Math.random().toString(36).substring(2) },
+        },
+      };
+
+      const response = await calendar.events.insert({
+        calendarId: 'primary',
+        resource: event,
+        conferenceDataVersion: 1,
+      });
+
+      const meetLink = response.data.hangoutLink;
+
+      // 2. Update appointment with Google Meet link and mark as completed
+      await appointmentModel.findByIdAndUpdate(appointmentId, { isCompleted: true, meetLink });
+
+      // 3. Send Email to user
+      const mailOptions = {
+        from: process.env.SENDER_EMAIL,
+        to: appointmentData.userData.email, // Make sure userData.email is populated
+        subject: 'Your Appointment is Confirmed!',
+        html: `
+          <h2>Your Appointment is Confirmed ✅</h2>
+          <p>Date: ${appointmentData.slotDate}</p>
+          <p>Time: ${appointmentData.slotTime}</p>
+          <p>Google Meet Link: <a href="${meetLink}">${meetLink}</a></p>
+        `,
+      };
+
+      await nodemailer.sendMail(mailOptions);
+
+      return res.json({ success: true, message: 'Appointment Completed & Link Sent', meetLink });
     }
 
-    // ✅ Update status
-    appointment.isCompleted = true;
-    appointment.status = "Approved";
-
-    // ✅ Calculate start/end times if not set
-    const [day, month, year] = appointment.slotDate.split("_");
-    const [hour, minute] = appointment.slotTime.split(":");
-    const startTime = new Date(`${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${hour}:${minute}:00`);
-    const endTime = new Date(startTime.getTime() + 30 * 60 * 1000);
-
-    const meetLink = "https://meet.google.com/new";
-
-    appointment.startTime = startTime;
-    appointment.endTime = endTime;
-    appointment.meetLink = meetLink;
-    await appointment.save();
-
-    // ✅ Generate PDF
-    const doc = new PDFDocument();
-    doc.fontSize(16).text("DocuSched Appointment Confirmation", { align: "center" });
-    doc.moveDown();
-    doc.text(`Doctor: Dr. ${appointment.doctor.name}`);
-    doc.text(`Patient: ${appointment.patient.name}`);
-    doc.text(`Date & Time: ${startTime.toLocaleString()}`);
-    doc.text(`Google Meet: ${meetLink}`);
-    doc.end();
-    const pdfBuffer = await getStream(doc);
-
-
-    // ✅ Send email to both doctor and patient
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: `"DocuSched" <${process.env.EMAIL_USER}>`,
-      to: [appointment.doctor.email, appointment.user.email],
-      subject: "Your Appointment is Confirmed with Google Meet",
-      html: `
-        <h3>Appointment Confirmed</h3>
-        <p><b>Doctor:</b> Dr. ${appointment.doctor.name}</p>
-        <p><b>Date:</b> ${startTime.toLocaleString()}</p>
-        <p><b>Google Meet Link:</b> <a href="${meetLink}">${meetLink}</a></p>
-      `,
-      attachments: [{
-        filename: "appointment.pdf",
-        content: pdfBuffer,
-        contentType: "application/pdf",
-      }],
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    // ✅ Send PDF buffer back to frontend
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename=appointment_${appointment._id}.pdf`);
-    res.send(pdfBuffer);
-
+    res.json({ success: false, message: 'Invalid Appointment' });
   } catch (error) {
-    console.error("Error in appointmentComplete:", error);
-    res.status(500).json({ success: false, message: "Internal Server Error" });
+    console.log(error);
+    res.json({ success: false, message: error.message });
   }
 };
+
+
+
+
+
 
 
 export { changeAvailability, doctorProfile, updateDoctorProfile,appointmentsDoctor,appointmentCancel,appointmentComplete }
