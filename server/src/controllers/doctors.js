@@ -143,7 +143,7 @@ const appointmentComplete = async (req, res) => {
 
     const mailOptions = {
       from: `"DocuSched" <${process.env.EMAIL_USER}>`,
-      to: [appointment.doctor.email, appointment.user.email],
+      to: [appointment.doctor?.email, appointment.patient?.email].filter(Boolean),
       subject: "Your Appointment is Confirmed with Google Meet",
       html: `
         <h3>Appointment Confirmed</h3>
