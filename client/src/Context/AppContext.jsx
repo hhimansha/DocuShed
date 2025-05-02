@@ -184,37 +184,35 @@ const AppContextProvider = (props) => {
 
   }
 
-  const delayPara = (indext,nextword)=>{
-      setTimeout(function(params){
-          setResultData(prev =>prev+nextword);
-      },20*indext)
-  }
-
-  const newchat  =()=>{
-    setIslogin(false)
-    setShowResult(false)
-  }
-
+  const delayPara = (index, nextWord) => {
+    setTimeout(() => {
+      setResultData(prev => prev + nextWord);
+    }, 20 * index);
+  };
+  
+  const newchat = () => {
+    setIslogin(false);
+    setShowResult(false);
+  };
+  
   const onsent = async (prompt) => {
-    const userInput = prompt || input; // Use `prompt` if available, otherwise fallback to `input`
-    
+    const userInput = prompt || input;
+  
     if (!userInput) {
       toast.error("Please enter a prompt.");
       return;
     }
   
     try {
-      setResultData(""); // ✅ Clear previous result before new request
+      setResultData("");
       setLoading(true);
       setShowResult(true);
-      setinput(""); // ✅ Clear input immediately to avoid old message display
+      setinput("");
   
-      // ✅ Update previous prompts before making the request
       SetPreviosPromts(prev => [...prev, userInput]);
       setRecentPromt(userInput);
   
-      // ✅ Send API request
-      let response = await axios.post(
+      const response = await axios.post(
         `${backendUrl}/api/ai/generate/`,
         { prompt: userInput },
         { withCredentials: true }
@@ -227,15 +225,18 @@ const AppContextProvider = (props) => {
         throw new Error("Response text is missing.");
       }
   
-      let responseArray = output.split("**");  
-      let newResponse = responseArray.map((chunk, i) =>
+      // ✅ Convert **bold** sections to <b>
+      const responseArray = output.split("**");
+      const newResponse = responseArray.map((chunk, i) =>
         i % 2 === 1 ? `<b>${chunk}</b>` : chunk
       ).join("");
   
-      let formattedResponse = newResponse.replace(/\*/g, "</br>");
-      
-      let newResponseArry = formattedResponse.split(" ");
-      newResponseArry.forEach((word, i) => delayPara(i, word + " "));
+      // ✅ Convert * to <br> for line breaks
+      const formattedResponse = newResponse.replace(/\*/g, "<br>");
+  
+      // ✅ Split into words and display with delay
+      const wordArray = formattedResponse.split(" ");
+      wordArray.forEach((word, i) => delayPara(i, word + " "));
   
       setLoading(false);
     } catch (error) {

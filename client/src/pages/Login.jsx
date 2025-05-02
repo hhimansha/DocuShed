@@ -14,6 +14,7 @@ const Login = () => {
   const [Email, setEmail] = useState('');
   const [Name, setName] = useState('');
   const [Password, setPassword] = useState('');
+  const [otpsubmit ,setotpsubmit]=useState(false)
 
 
   const onSubmitHandler = async (event) => {
@@ -182,6 +183,11 @@ const Login = () => {
         </p>
       </div>
       <ToastContainer position="top-right" autoClose={2000} />
+
+     
+
+
+
     </form>
   );
 };

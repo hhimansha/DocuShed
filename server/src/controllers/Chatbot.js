@@ -1,13 +1,13 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
-import fs from "fs";
-import mime from "mime-types";
+import { GoogleGenAI } from "@google/genai";
 import dotenv from "dotenv";
 import Doctor from "../models/doctorModel.js";
+import appointmentModel from "../models/appointmentModel.js";
 
 dotenv.config();
 
 const generateAIResponse = async (req, res) => {
   const { prompt } = req.body;
+  const userId = req.body.userId;
 
   if (!prompt) {
     return res.status(400).json({ error: "Prompt is required" });
@@ -19,93 +19,94 @@ const generateAIResponse = async (req, res) => {
   }
 
   try {
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
     const lowerPrompt = prompt.toLowerCase();
 
-    // Always try to find doctor-related parameters
-    let fullPrompt;
-    try {
-      // Fetch distinct specialities and cities
-      const specialities = await Doctor.distinct('speciality');
-      const cities = await Doctor.distinct('address.city');
+    const greetings = ['hi', 'hello', 'hey', 'good morning', 'good afternoon', 'good evening'];
+    if (greetings.some(greet => lowerPrompt.includes(greet))) {
+      return res.json({ text: "Hi! I am Asiri Hospital chatbot. How can I assist you today?" });
+    }
 
-      // Find matching parameters in prompt
-      let foundSpeciality = specialities.find(spec => 
-        lowerPrompt.includes(spec.toLowerCase())
-      );
-      let foundCity = cities.find(city => 
-        lowerPrompt.includes(city.toLowerCase())
-      );
+    // ✅ If user asks about appointments
+    if (
+      lowerPrompt.includes("my appointment") ||
+      lowerPrompt.includes("my appointments") ||
+      lowerPrompt.includes("upcoming appointment")
+    ) {
+      try {
+        const appointments = await appointmentModel.find({ userId, cancelled: false });
 
-      // Build query
-      const query = {};
-      if (foundSpeciality) query.speciality = foundSpeciality;
-      if (foundCity) query['address.city'] = foundCity;
+        if (appointments.length === 0) {
+          return res.json({ text: "You have no upcoming appointments." });
+        }
 
-      const doctors = await Doctor.find(query);
+        const appointmentDetails = appointments.map((apt, i) => {
+          return `**Appointment ${i + 1}:** - Doctor: ${apt.docData?.name} - Speciality: ${apt.docData?.speciality} - Date & Time: ${apt.slotDate} | ${apt.slotTime}`;
+        }).join(" \n");
+        
 
-      if (doctors.length === 0) {
-        fullPrompt = `No doctors found in our database. User's question: ${prompt}`;
-      } else {
-        const doctorInfo = doctors.map((doc, index) => {
-          const address = doc.address ? 
-            [doc.address.street, doc.address.city, doc.address.state].filter(Boolean).join(', ') : 
-            'Address not available';
+        return res.json({ text: `Here are your upcoming appointments:\n ${appointmentDetails}` });
+        ;
+      } catch (err) {
+        console.error("DB appointment error:", err);
+        return res.status(500).json({ text: "Sorry, could not retrieve your appointments due to a server error." });
+      }
+    }
 
-          return `Doctor ${index + 1}:
+    // 🌐 Use AI for general questions or doctor search
+    const ai = new GoogleGenAI({ apiKey });
+
+    const specialities = await Doctor.distinct("speciality");
+    const cities = await Doctor.distinct("address.city");
+
+    const foundSpeciality = specialities.find(spec =>
+      lowerPrompt.includes(spec.toLowerCase())
+    );
+    const foundCity = cities.find(city =>
+      lowerPrompt.includes(city.toLowerCase())
+    );
+
+    const query = {};
+    if (foundSpeciality) query.speciality = foundSpeciality;
+    if (foundCity) query["address.city"] = foundCity;
+
+    const doctors = await Doctor.find(query);
+
+    let fullPrompt = "";
+
+    if (doctors.length === 0) {
+      fullPrompt = `No doctors found in our database. User's question: ${prompt}`;
+    } else {
+      const doctorInfo = doctors.map((doc, index) => {
+        const address = doc.address
+          ? [doc.address.street, doc.address.city, doc.address.state].filter(Boolean).join(", ")
+          : "Address not available";
+
+        return `Doctor ${index + 1}:
 - Name: ${doc.name}
-- Image: ${doc.image}
 - Speciality: ${doc.speciality}
 - Degree: ${doc.degree}
 - Experience: ${doc.experience}
 - Address: ${address}
-- Availability: ${doc.available ? 'Available' : 'Not available'}
+- Availability: ${doc.available ? "Available" : "Not available"}
 - Fees: $${doc.fees}
 - About: ${doc.about}`;
-        }).join('\n\n');
+      }).join("\n\n");
 
-        fullPrompt = `Our database contains these doctors:\n\n${doctorInfo}\n\nUser's question: ${prompt}\n\nProvide a response based on this data.`;
-      }
-    } catch (dbError) {
-      console.error("Database error:", dbError);
-      fullPrompt = `${prompt}\n\n[Note: Could not access medical database.]`;
+      fullPrompt = `Our database contains these doctors:\n\n${doctorInfo}\n\nUser's question: ${prompt}\n\nProvide a helpful and relevant response.`;
     }
 
-    // Generate response with the constructed prompt
-    const generationConfig = {
-      temperature: 1,
-      topP: 0.95,
-      topK: 40,
-      maxOutputTokens: 8192,
-    };
-
-    const chatSession = model.startChat({
-      generationConfig,
-      history: [],
+    const response = await ai.models.generateContent({
+      model: "models/gemini-1.5-flash",
+      contents: [
+        {
+          role: "user",
+          parts: [{ text: fullPrompt }],
+        },
+      ],
     });
 
-    const result = await chatSession.sendMessage(fullPrompt);
-    
-    // Handle inline data (if any)
-    const candidates = result.response.candidates;
-    if (candidates) {
-      candidates.forEach((candidate, candidate_index) => {
-        candidate.content.parts.forEach((part, part_index) => {
-          if (part.inlineData) {
-            try {
-              const filename = `output_${candidate_index}_${part_index}.${mime.extension(part.inlineData.mimeType)}`;
-              fs.writeFileSync(filename, Buffer.from(part.inlineData.data, "base64"));
-              console.log(`File saved: ${filename}`);
-            } catch (err) {
-              console.error("Error saving file:", err);
-            }
-          }
-        });
-      });
-    }
-
-    res.json({ text: result.response.text() });
+    const resultText = response.candidates?.[0]?.content?.parts?.[0]?.text || "No response";
+    res.json({ text: resultText });
 
   } catch (err) {
     console.error("AI generation error:", err);
