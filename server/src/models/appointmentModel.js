@@ -4,6 +4,8 @@ const appointmentSchema = new mongoose.Schema({
     userId: { type: String, required: true },
     docId: { type: String, required: true },
     doctorsId: { type: String, required: true },
+    doctor: { type: mongoose.Schema.Types.ObjectId, ref: "Doctor", required: true },
+    patient: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
     slotDate: { type: String, required: true },
     slotTime: { type: String, required: true },
     userData: { type: Object, required: true },
@@ -12,7 +14,11 @@ const appointmentSchema = new mongoose.Schema({
     date: { type: Number, required: true },
     cancelled: { type: Boolean, default: false },
     payment: { type: Boolean, default: false },
-    isCompleted: { type: Boolean, default: false }
+    isCompleted: { type: Boolean, default: false },
+
+    startTime: { type: Date },
+    endTime: { type: Date },
+    meetLink: { type: String } 
 })
 
 const appointmentModel = mongoose.models.appointment || mongoose.model("appointment", appointmentSchema)
