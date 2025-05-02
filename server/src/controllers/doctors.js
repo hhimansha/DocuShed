@@ -103,11 +103,11 @@ const appointmentComplete = async (req, res) => {
       return res.json({ success: false, message: "Invalid or unauthorized" });
     }
 
-    // ✅ Update status
+    // Update status
     appointment.isCompleted = true;
     appointment.status = "Approved";
 
-    // ✅ Calculate start/end times if not set
+    // Calculate start/end times if not set
     const [day, month, year] = appointment.slotDate.split("_");
     const [hour, minute] = appointment.slotTime.split(":");
     const startTime = new Date(`${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${hour}:${minute}:00`);
@@ -120,7 +120,7 @@ const appointmentComplete = async (req, res) => {
     appointment.meetLink = meetLink;
     await appointment.save();
 
-    // ✅ Generate PDF
+    // Generate PDF
     const doc = new PDFDocument();
     doc.fontSize(16).text("DocuSched Appointment Confirmation", { align: "center" });
     doc.moveDown();
@@ -132,7 +132,7 @@ const appointmentComplete = async (req, res) => {
     const pdfBuffer = await getStream(doc);
 
 
-    // ✅ Send email to both doctor and patient
+    // Send email to both doctor and patient
     const transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
