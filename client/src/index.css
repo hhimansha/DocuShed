@@ -123,7 +123,7 @@
 
 
 #root {
-  --color-primary: #5f6FFF;
+  --color-primary: #002284;
 
  
   
@@ -136,11 +136,11 @@
 
 
 .bg-primary {
-  background-color: #5f6FFF; /* ✅ Use it here */
+  background-color: #002284; /* ✅ Use it here */
 }
 
 .border-primary {
-  border-color: #5f6FFF !important;
+  border-color: #002284 !important;
 }
 
 
@@ -152,6 +152,4 @@
   display: none; /* ✅ Use this instead of @apply hidden */
 }
 
-*{
-  font-family: outfit;
-}
+

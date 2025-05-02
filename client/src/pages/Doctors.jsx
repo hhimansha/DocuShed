@@ -1,7 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { AppContext } from '../Context/AppContext'
-
+import FloatingChatbot from '../components/chat/FloatingChatbot'
 const Doctors = () => {
   const { speciality } = useParams()
   const navigate = useNavigate();
@@ -67,6 +67,7 @@ const Doctors = () => {
           ))}
         </div>
       </div>
+      <FloatingChatbot />
     </div>
   )
 }
