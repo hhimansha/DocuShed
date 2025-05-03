@@ -1,3 +1,5 @@
+//change availablity
+
 import appointmentModel from "../models/appointmentModel.js"
 import Doctor from "../models/doctorModel.js"
 import nodemailer from '../config/nodemailer.js'

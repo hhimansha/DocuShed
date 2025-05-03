@@ -2,6 +2,7 @@ import validator from "validator";
 import bcrypt from "bcryptjs";
 import { v2 as cloudinary } from "cloudinary";
 import userModel from "../models/userModel.js";
+import Payment from "../models/Payment.js";
 import Doctor from "../models/doctorModel.js";  // This is correct
 import appointmentModel from "../models/appointmentModel.js";
 //import Doctor from "../models/doctorModel.js";
@@ -97,30 +98,43 @@ const allDoctors = async (req, res) => {
 
   // API to get dahbord data for admin pannel
 
-  const admindashbord = async (req,res) =>{
+  const admindashbord = async (req, res) => {
     try {
-        const doctors =await Doctor.find({})
-        const users = await userModel.find({
-            role: 'user'
-          });
-          const appointment=await appointmentModel.find({});
+        const doctors = await Doctor.find({});
+        const users = await userModel.find({ role: 'user' });
+        const appointments = await appointmentModel.find({});
+        const payments = await Payment.find({});
+        
+        // Get latest 5 appointments sorted by date
+        const latestAppointments = await appointmentModel.find({})
+            .sort({ date: -1 })
+            .limit(5)
+            .populate('patient', 'name email')
+            .populate('doctor', 'name');
+        
+        // Calculate total earnings
+        const totalEarnings = payments.reduce((sum, payment) => sum + payment.amount, 0);
 
-
-          const dashData= {
+        const dashData = {
             doctors: doctors.length,
-            patients:users.length,
-            appointment:appointment.length
-          }
+            patients: users.length,
+            appointment: appointments.length,
+            totalEarnings,
+            latestAppointments,
+            // Add payment stats for charts
+            paymentStats: {
+                completed: payments.filter(p => p.status === 'completed').length,
+                pending: payments.filter(p => p.status === 'pending').length,
+                failed: payments.filter(p => p.status === 'failed').length
+            }
+        };
 
-          res.json({success:true,dashData})
-          
-        
+        res.json({ success: true, dashData });
     } catch (error) {
-        console.log(error)
+        console.log(error);
         res.status(500).json({ success: false, message: "Server Error", error });
-        
     }
-  }
+};
 
   const allpatient = async (req, res) => {
     try {

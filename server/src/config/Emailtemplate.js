@@ -3,7 +3,7 @@ export const Email_very_template=`<!DOCTYPE html>
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Reset Password - Prescripto</title>
+  <title>Reset Password - Docushed</title>
   <style>
     body {
       margin: 0;
@@ -76,12 +76,12 @@ export const Email_very_template=`<!DOCTYPE html>
 <body>
   <div class="container">
     <div class="header">
-      <h1>Prescripto</h1>
+      <h1>Docushed</h1>
     </div>
     <div class="body">
       <h2>Reset Your Password</h2>
       <p>Hello,</p>
-      <p>We received a request to reset your password for your <strong>Prescripto</strong> account.</p>
+      <p>We received a request to reset your password for your <strong>Docushed</strong> account.</p>
       <p>Use the OTP below to proceed:</p>
       <div class="otp">{{otp}}</div>
       <p>This OTP is valid for 10 minutes.</p>
@@ -89,8 +89,8 @@ export const Email_very_template=`<!DOCTYPE html>
       <p style="margin-top: 30px;">If you did not request a password reset, please ignore this email.</p>
     </div>
     <div class="footer">
-      &copy; 2025 Prescripto. All Rights Reserved. <br />
-      Need help? <a href="mailto:support@prescripto.com">Contact Support</a>
+      &copy; 2025 Docushed. All Rights Reserved. <br />
+      Need help? <a href="mailto:support@docushed.com">Contact Support</a>
     </div>
   </div>
 </body>

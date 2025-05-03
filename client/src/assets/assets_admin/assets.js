@@ -12,6 +12,7 @@ import appointments_icon from './appointments_icon.svg'
 import earning_icon from './earning_icon.svg'
 import patients_icon from './patients_icon.svg'
 import patient1 from './patient1.png'
+import Docushed from '../../assets/Docushed.png'
 
 export const assets = {
     add_icon,
@@ -22,6 +23,7 @@ export const assets = {
     upload_area,
     home_icon,
     patients_icon,
+    Docushed,
     people_icon,
     list_icon,
     tick_icon,

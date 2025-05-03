@@ -42,6 +42,7 @@ import upload_area from './upload_area.png'
 import upload from './upload.png'
 import delete1 from './delete.png'
 import patient from './patient.png'
+import Docushed from './Docushed.png'
 
 export const assets = {
     appointment_img,
@@ -62,6 +63,7 @@ export const assets = {
     stripe_logo,
     razorpay_logo,
     mail_icon,
+    Docushed,
     lock_icon,
     upload_area,
     upload,delete1,

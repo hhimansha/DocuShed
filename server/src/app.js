@@ -10,6 +10,7 @@ import chatbotrouter from "./routes/chatbotrouter.js";
 import session from 'express-session';
 
 // import userRoutes from "./routes/userRoutes";
+import paymentRouter from "./routes/paymentRoutes.js";
 
 dotenv.config();
 
@@ -31,5 +32,6 @@ app.get('/',(req,res)=>res.send("API working fine"));
  app.use("/api/doctor",doctorRouter)
  app.use('/api/ai',chatbotrouter)
  
+ app.use("/api/payments", paymentRouter)
  
 export default app;

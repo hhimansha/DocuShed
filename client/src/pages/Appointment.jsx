@@ -102,38 +102,37 @@ const Appointment = () => {
   };
   
 
-  const bookAppointment = async () => {
-    if (!userdata) {
-        toast.warning('Login to book appointment')
-        return navigate('/login')
+// In the bookAppointment function
+const bookAppointment = async () => {
+  if (!userdata) {
+    toast.warning('Login to book appointment')
+    return navigate('/login')
+  }
+
+  const date = docSlots[slotIndex].date
+  let day = date.getDate()
+  let month = date.getMonth() + 1
+  let year = date.getFullYear()
+  const slotDate = day + "_" + month + "_" + year
+
+  try {
+    const { data } = await axios.post(backendUrl + '/api/auth/book-appointment', 
+      { docId, slotDate, slotTime }, 
+      { withCredentials: true }
+    )
+    
+    if (data.success) {
+      toast.success(data.message)
+      getDoctorsData();
+      // Redirect to confirmation page with appointment ID
+      navigate(`/appointment-confirmation/${data.appointment._id}`)
+    } else {
+      toast.error(data.message)
     }
-
-    // Get date from the selected day's date property
-    const date = docSlots[slotIndex].date
-
-    let day = date.getDate()
-    let month = date.getMonth() + 1
-    let year = date.getFullYear()
-
-    const slotDate = day + "_" + month + "_" + year
-
-    try {
-        const { data } = await axios.post(backendUrl + '/api/auth/book-appointment', 
-            { docId, slotDate, slotTime }, 
-            { withCredentials: true }
-        )
-        
-        if (data.success) {
-            toast.success(data.message)
-            getDoctorsData();
-            navigate('/my-appointments')
-        } else {
-            toast.error(data.message)
-        }
-    } catch (error) {
-        console.log(error)
-        toast.error(error.response?.data?.message || error.message)
-    }
+  } catch (error) {
+    console.log(error)
+    toast.error(error.response?.data?.message || error.message)
+  }
 }
 
 
