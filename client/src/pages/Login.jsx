@@ -147,7 +147,7 @@ const Login = () => {
 
         {state === "Login" && (
       <p
-      className="text-indigo-600 cursor-pointer hover:underline"
+      className="text-002284 cursor-pointer hover:underline"
       onClick={() => {
         navigate('/reset-password');
         window.location.href = '/reset-password';
@@ -159,7 +159,7 @@ const Login = () => {
         )}
         <button
           onClick={onSubmitHandler}
-          className="bg-indigo-600 text-white w-full py-3 rounded-md text-base mt-4 hover:bg-indigo-700 transition duration-200"
+          className="bg-[#002284] text-white w-full py-3 rounded-md text-base mt-4 hover:bg-[#002284] transition duration-200"
         >
           {state === 'Sign up' ? 'Create Account' : 'Login'}
         </button>
@@ -168,14 +168,14 @@ const Login = () => {
           {state === 'Sign up' ? (
             <span
               onClick={() => setState('Login')}
-              className="text-indigo-600 cursor-pointer hover:underline"
+              className="text-[#002284] cursor-pointer hover:underline"
             >
               Already have an account? Login here.
             </span>
           ) : (
             <span
               onClick={() => setState('Sign up')}
-              className="text-indigo-600 cursor-pointer hover:underline"
+              className="text-[#002284] cursor-pointer hover:underline"
             >
               Don't have an account? Sign up here.
             </span>

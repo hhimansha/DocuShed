@@ -4,17 +4,17 @@ const paymentSchema = new mongoose.Schema({
   appointmentId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'appointments'
+    ref: 'appointment'
   },
   doctorId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'doctors'
+    ref: 'Doctor'
   },
   userId: {
     type: mongoose.Schema.Types.ObjectId,
     required: true,
-    ref: 'users'
+    ref: 'User'
   },
   amount: {
     type: Number,

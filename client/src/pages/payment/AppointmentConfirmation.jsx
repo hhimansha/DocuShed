@@ -1,47 +1,62 @@
 import { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { AppContext } from '../../context/AppContext';
+import { useContext } from 'react';
+
 
 const AppointmentConfirmation = () => {
-  const location = useLocation();
+  const { appointmentId } = useParams();
   const navigate = useNavigate();
   const [isProcessing, setIsProcessing] = useState(false);
-  const [appointment, setAppointment] = useState({
-    doctor: {
-      id: '67de99784ca990e4c2e054a3',
-      name: 'Dr. Sarah Johnson',
-      specialization: 'Cardiologist',
-      image: 'https://res.cloudinary.com/dioir4ydv/image/upload/v1742641529/h9ny4qyzr0aohxxvk5be.png',
-      hourlyRate: 5000, // LKR
-    },
-    date: '2023-11-15',
-    time: '14:30 - 15:00',
-    duration: 0.5, // hours
-    user: {
-      id: '67e66a0e01744f4d2de6b916',
-      name: 'John Doe',
-      email: 'john@example.com',
-      phone: '0771234567'
-    }
-  });
+  const [appointment, setAppointment] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { backendUrl} = useContext(AppContext);
+
+  useEffect(() => {
+    const fetchAppointment = async () => {
+      try {
+        const response = await axios.get(backendUrl + `/api/auth/appointments/${appointmentId}`, {
+          withCredentials: true
+        });
+        
+        if (response.data.success) {
+          setAppointment(response.data.appointment);
+        } else {
+          setError('Failed to load appointment details');
+        }
+      } catch (err) {
+        setError(err.response?.data?.error || err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAppointment();
+  }, [appointmentId]);
 
   // Calculate total amount
-  const totalAmount = appointment.doctor.hourlyRate * appointment.duration;
+  const totalAmount = appointment?.amount || 0;
 
   // Initialize PayHere payment
   const handlePayment = async () => {
+    if (!appointment) return;
+    
     setIsProcessing(true);
     try {
-      const response = await axios.post('http://localhost:5000/api/payments/initiate', {
-        appointmentId: '67df0c15d07116292701cdff', // Replace with actual appointment ID
-        doctorId: appointment.doctor.id,
-        userId: appointment.user.id,
+      const response = await axios.post(backendUrl + '/api/payments/initiate', {
+        appointmentId: appointment._id,
+        doctorId: appointment.doctor._id,
+        userId: appointment.patient._id,
         amount: totalAmount,
-        doctorName: appointment.doctor.name,
-        userFirstName: appointment.user.name.split(' ')[0],
-        userLastName: appointment.user.name.split(' ')[1] || '',
-        userEmail: appointment.user.email,
-        userPhone: appointment.user.phone
+        doctorName: appointment.docData?.name || 'Doctor',
+        userFirstName: appointment.userData?.name?.split(' ')[0] || 'User',
+        userLastName: appointment.userData?.name?.split(' ')[1] || '',
+        userEmail: appointment.userData?.email || '',
+        userPhone: appointment.userData?.phone || ''
+      }, {
+        withCredentials: true
       });
 
       // Load PayHere script dynamically
@@ -50,24 +65,19 @@ const AppointmentConfirmation = () => {
       script.async = true;
       
       script.onload = () => {
-        // Initialize PayHere checkout
-        window.payhere.onCompleted = function(onCompleted) {
-          // Handle successful payment
+        window.payhere.onCompleted = function() {
           navigate('/payment-success');
         };
         
-        window.payhere.onDismissed = function(onDismissed) {
-          // Handle dismissed payment
+        window.payhere.onDismissed = function() {
           setIsProcessing(false);
         };
         
-        window.payhere.onError = function(onError) {
-          // Handle error
+        window.payhere.onError = function() {
           setIsProcessing(false);
           alert('Payment failed. Please try again.');
         };
         
-        // Start payment
         window.payhere.startPayment(response.data.paymentData);
       };
       
@@ -76,111 +86,134 @@ const AppointmentConfirmation = () => {
     } catch (error) {
       console.error('Payment error:', error);
       setIsProcessing(false);
-      alert('Payment initialization failed. Please try again.');
+      alert(error.response?.data?.error || 'Payment initialization failed. Please try again.');
     }
   };
 
+  if (loading) {
+    return <div className="min-h-screen flex items-center justify-center">Loading...</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+          {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!appointment) {
+    return <div className="min-h-screen flex items-center justify-center">Appointment not found</div>;
+  }
+
+  // Format date and time
+  const [day, month, year] = appointment.slotDate.split('_');
+  const appointmentDate = new Date(year, month - 1, day);
+  const formattedDate = appointmentDate.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric'
+  });
+
   return (
-    <div className="min-h-screen py-8 px-4 sm:px-6 lg:px-8">
-      <div className="mx-auto">
-        <div className="bg-white shadow-lg rounded-lg overflow-hidden">
-          {/* Header */}
-          <div className="bg-indigo-700 px-6 py-4">
-            <h1 className="text-2xl font-bold text-white">Appointment Confirmation</h1>
-            <p className="mt-1 text-indigo-200">Review your appointment details before payment</p>
-          </div>
-          
-          {/* Appointment Details */}
-          <div className="px-6 py-8">
-            <div className="flex flex-col md:flex-row gap-8">
-              {/* Doctor Info */}
-              <div className="md:w-1/3">
-                <div className="rounded-lg overflow-hidden shadow-sm border border-gray-200">
-                  <img 
-                    src={appointment.doctor.image} 
-                    alt={appointment.doctor.name}
-                    className="w-full h-80 object-cover"
-                  />
-                  <div className="p-4">
-                    <h2 className="text-xl font-semibold text-gray-800">{appointment.doctor.name}</h2>
-                    <p className="text-indigo-600">{appointment.doctor.specialization}</p>
-                    <div className="mt-2">
-                      <span className="text-gray-600">Hourly Rate:</span>
-                      <span className="ml-2 font-medium">LKR {appointment.doctor.hourlyRate.toLocaleString()}</span>
-                    </div>
+    <div className="min-h-screen bg-gray-100 py-10 px-4 sm:px-8 lg:px-24">
+    <div className="max-w-5xl mx-auto">
+      <div className="bg-white shadow-xl rounded-2xl overflow-hidden">
+        {/* Header */}
+        <div className="bg-gradient-to-r from-[#002284] to-indigo-800 px-8 py-6">
+          <h1 className="text-3xl font-bold text-white">Appointment Confirmation</h1>
+          <p className="mt-2 text-indigo-200 text-sm">Please review and confirm your appointment details below</p>
+        </div>
+
+        {/* Content */}
+        <div className="p-8">
+          <div className="flex flex-col lg:flex-row gap-10">
+            {/* Doctor Card */}
+            <div className="lg:w-1/3">
+              <div className="rounded-xl overflow-hidden shadow-md border border-gray-200 bg-white transition hover:shadow-lg">
+                <img 
+                  src={appointment.docData?.image} 
+                  alt={appointment.docData?.name}
+                  className="w-full h-72 object-cover"
+                />
+                <div className="p-5 space-y-2">
+                  <h2 className="text-2xl font-semibold text-gray-900">{appointment.docData?.name}</h2>
+                  <p className="text-sm text-[#002284] font-medium">{appointment.docData?.speciality}</p>
+                  <div className="pt-2 border-t text-sm text-gray-700">
+                    <span className="block">Appointment Fee:</span>
+                    <span className="text-lg font-semibold">LKR {appointment.amount.toLocaleString()}</span>
                   </div>
                 </div>
               </div>
-              
-              {/* Appointment Summary */}
-              <div className="md:w-2/3">
-                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
-                  <h3 className="text-lg font-medium text-gray-900 mb-4">Appointment Summary</h3>
-                  
-                  <div className="space-y-4">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Date:</span>
-                      <span className="font-medium">{new Date(appointment.date).toLocaleDateString('en-US', { 
-                        weekday: 'long', 
-                        year: 'numeric', 
-                        month: 'long', 
-                        day: 'numeric' 
-                      })}</span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Time:</span>
-                      <span className="font-medium">{appointment.time}</span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Duration:</span>
-                      <span className="font-medium">{appointment.duration} hour(s)</span>
-                    </div>
-                    
-                    <div className="border-t border-gray-200 my-4"></div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Hourly Rate:</span>
-                      <span className="font-medium">LKR {appointment.doctor.hourlyRate.toLocaleString()}</span>
-                    </div>
-                    
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">Total Amount:</span>
-                      <span className="font-bold text-indigo-700">LKR {totalAmount.toLocaleString()}</span>
-                    </div>
+            </div>
+
+            {/* Summary */}
+            <div className="lg:w-2/3">
+              <div className="bg-gray-50 rounded-xl p-6 border border-gray-200">
+                <h3 className="text-xl font-semibold text-gray-800 mb-6">Appointment Summary</h3>
+
+                <div className="space-y-5 text-base text-gray-700">
+                  <div className="flex justify-between">
+                    <span>Date:</span>
+                    <span className="font-medium">{formattedDate}</span>
                   </div>
-                  
-                  <div className="mt-8">
-                    <div className='flex '>
-                    <button
-                      onClick={handlePayment}
-                      disabled={isProcessing}
-                      className={`w-80 justify-end flex py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 ${isProcessing ? 'opacity-75 cursor-not-allowed' : ''}`}
-                    >
-                      {isProcessing ? (
-                        <>
-                          <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                          </svg>
-                          Processing...
-                        </>
-                      ) : 'Proceed to Payment'}
-                    </button>
-                    </div>
-                    
-                    <p className="mt-3 text-center text-sm text-gray-500">
-                      You'll be redirected to PayHere for secure payment processing
-                    </p>
+
+                  <div className="flex justify-between">
+                    <span>Time:</span>
+                    <span className="font-medium">{appointment.slotTime}</span>
                   </div>
+
+                  <div className="border-t border-gray-300 my-4"></div>
+
+                  <div className="flex justify-between text-lg font-semibold text-indigo-700">
+                    <span>Total Amount:</span>
+                    <span>LKR {totalAmount.toLocaleString()}</span>
+                  </div>
+                </div>
+
+                <div className="mt-8 text-center">
+                  <button
+                    onClick={handlePayment}
+                    disabled={isProcessing || appointment.payment}
+                    className={`w-full max-w-xs mx-auto py-3 px-5 rounded-lg text-lg font-medium shadow-md transition ${
+                      isProcessing
+                        ? 'bg-indigo-400 cursor-not-allowed'
+                        : appointment.payment
+                        ? 'bg-green-600 hover:bg-green-700'
+                        : 'bg-[#002284] hover:bg-indigo-700 text-white'
+                    }`}
+                  >
+                    {appointment.payment ? (
+                      'Payment Completed'
+                    ) : isProcessing ? (
+                      <div className="flex items-center justify-center gap-2">
+                        <svg className="animate-spin h-5 w-5 text-white" viewBox="0 0 24 24">
+                          <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                          <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                        </svg>
+                        Processing...
+                      </div>
+                    ) : (
+                      'Proceed to Payment'
+                    )}
+                  </button>
+
+                  <p className="mt-3 text-sm text-gray-500">
+                    {appointment.payment
+                      ? 'Your payment has been successfully processed'
+                      : "You'll be redirected to PayHere for secure payment"}
+                  </p>
                 </div>
               </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
+    </div> 
+  </div>
   );
 };
 

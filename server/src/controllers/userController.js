@@ -6,7 +6,7 @@ import { Email_very_template } from '../config/Emailtemplate.js';
 import validator from "validator";
 import Doctor from '../models/doctorModel.js';
 import {v2 as cloudinary}from 'cloudinary'
-import appointment from '../models/appointmentModel.js'
+import appointmentModel from '../models/appointmentModel.js'
 //import { Email_very_template } from '../config/Emailtemplate.js';
 
 export const register = async (req, res) => {
@@ -56,7 +56,7 @@ export const register = async (req, res) => {
             from: process.env.SENDER_EMAIL,
             to: email,
             subject: 'Welcome to pizza hut ',
-            text: `Welcome to Prescripto: ${email}`
+            text: `Welcome to Docushed: ${email}`
         }
 
         await transporter.sendMail(mailOption);
@@ -175,6 +175,7 @@ export const getUserData = async (req, res) => {
         return res.json({
             success: true,
             userData: {
+                _id: user._id,
                 name: user.name,
                 role: user.role,
                 image: user.image,
@@ -459,13 +460,13 @@ const doctorsId = doctor.userId;
             date: Date.now()
         }
 
-        const newAppointment = new appointment(appointmentData)
+        const newAppointment = new appointmentModel(appointmentData)
         await newAppointment.save()
 
         // save new slots data in docData
         await Doctor.findByIdAndUpdate(docId, { slots_booked })
 
-        res.json({ success: true, message: 'Appointment Booked' })
+        res.json({ success: true, message: 'Appointment Booked', appointment: newAppointment })
 
     } catch (error) {
         console.log(error)
@@ -477,7 +478,7 @@ export const listAppointment = async (req, res) => {
     try {
 
         const { userId } = req.body
-        const appointments = await appointment.find({ userId })
+        const appointments = await appointmentModel.find({ userId })
 
         res.json({ success: true, appointments })
 
@@ -486,6 +487,32 @@ export const listAppointment = async (req, res) => {
         res.json({ success: false, message: error.message })
     }
 }
+
+export const getAppointmentDetails = async (req, res) => {
+    try {
+      const { appointmentId } = req.params;
+      
+      const appointment = await appointmentModel.findById(appointmentId)
+        .populate('doctor', 'name speciality image fees')
+        .populate('patient', 'name email phone');
+  
+      if (!appointment) {
+        return res.status(404).json({ success: false, error: 'Appointment not found' });
+      }
+  
+      res.status(200).json({
+        success: true,
+        appointment
+      });
+    } catch (error) {
+      console.error('Error fetching appointment:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to fetch appointment details',
+        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      });
+    }
+  };
 
 
 export const cancelAppointment = async (req, res) => {

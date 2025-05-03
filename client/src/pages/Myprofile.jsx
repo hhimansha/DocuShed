@@ -206,7 +206,7 @@ const MyProfile = () => {
               </div>
               
               <div className="md:ml-6 mt-4 md:mt-0 text-center md:text-left flex-grow">
-                <h1 className="text-3xl font-bold text-gray-800">{userdata?.name}</h1>
+                <h1 className="text-3xl font-bold text-white mb-8">{userdata?.name}</h1>
                 <div className="flex items-center justify-center md:justify-start text-gray-600 mt-1">
                   <Mail className="h-4 w-4 mr-2" />
                   <p>{userdata?.email}</p>

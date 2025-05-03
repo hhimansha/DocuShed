@@ -1,5 +1,6 @@
 import Payment from '../models/Payment.js';
 import crypto from 'crypto';
+import appointmentModel from '../models/appointmentModel.js';
 
 // PayHere configuration
 const PAYHERE_CONFIG = {
@@ -77,14 +78,7 @@ export const initiatePayment = async (req, res) => {
         .update(hashString)
         .digest('hex')
         .toUpperCase();
-  
-      // Debug logs (remove in production)
-      console.log('Hash Generation Debug:');
-      console.log('Step 1 - Merchant Secret:', PAYHERE_CONFIG.MERCHANT_SECRET);
-      console.log('Step 2 - Inner MD5:', innerHash);
-      console.log('Step 3 - Final Hash String:', hashString);
-      console.log('Step 4 - Final Hash:', paymentData.hash);
-  
+
       res.status(200).json({
         success: true,
         paymentData,
@@ -103,7 +97,7 @@ export const initiatePayment = async (req, res) => {
 // Handle PayHere webhook
 export const handleWebhook = async (req, res) => {
   try {
-    const { order_id, payment_id, status_code, md5sig } = req.body;
+    const { order_id, payment_id, status_code, md5sig, custom_1 } = req.body;
     
     // Verify the signature
     const expectedSignature = crypto.createHash('md5')
@@ -122,26 +116,35 @@ export const handleWebhook = async (req, res) => {
       return res.status(400).send('Invalid signature');
     }
 
-
     // Update payment status
     const payment = await Payment.findByIdAndUpdate(
-        order_id,
-        {
-          payherePaymentId: payment_id,
-          status: status_code === '2' ? 'completed' : 
-                 (status_code === '0' ? 'pending' : 'failed'),
-          updatedAt: Date.now()
-        },
-        { new: true }
-      );
+      order_id,
+      {
+        payherePaymentId: payment_id,
+        status: status_code === '2' ? 'completed' : 
+               (status_code === '0' ? 'pending' : 'failed'),
+        updatedAt: Date.now()
+      },
+      { new: true }
+    );
 
     if (!payment) {
-        console.error('Payment not found for order_id:', order_id);
-        return res.status(404).send('Payment not found');
-      }
+      console.error('Payment not found for order_id:', order_id);
+      return res.status(404).send('Payment not found');
+    }
 
-      console.log(`Payment ${payment._id} updated to status: ${payment.status}`);
-      res.status(200).send('OK');
+    // Only update appointment if payment was successful (status_code 2)
+    if (status_code === '2') {
+      await appointmentModel.findByIdAndUpdate(
+        payment.appointmentId, // or custom_1 if you prefer
+        { payment: true },
+        { new: true }
+      );
+      console.log(`Appointment ${payment.appointmentId} marked as paid`);
+    }
+
+    console.log(`Payment ${payment._id} updated to status: ${payment.status}`);
+    res.status(200).send('OK');
   } catch (error) {
     console.error('Webhook error:', error);
     res.status(500).send('Webhook processing failed');
@@ -244,6 +247,7 @@ export const getAllPayments = async (req, res) => {
         .sort({ createdAt: -1 })
         .populate({
           path: 'userId',
+          model: 'User',
           select: 'name email'
         })
         .populate({
@@ -259,10 +263,12 @@ export const getAllPayments = async (req, res) => {
           status: payment.status,
           createdAt: payment.createdAt,
           patient: {
+            userId: payment.userId._id,
             name: payment.userId.name,
             email: payment.userId.email
           },
           appointment: {
+            appointmentId: payment.appointmentId._id,
             date: payment.appointmentId.date,
             timeSlot: payment.appointmentId.timeSlot
           }
@@ -270,6 +276,73 @@ export const getAllPayments = async (req, res) => {
       });
     } catch (error) {
       res.status(500).json({ success: false, error: error.message });
+    }
+  };
+
+  export const updatePaymentStatus = async (req, res) => {
+    try {
+      const { id } = req.params;
+      const { status } = req.body;
+  
+      // Validate status
+      const validStatuses = ['success', 'pending', 'canceled', 'failed', 'chargedback'];
+      if (!validStatuses.includes(status)) {
+        return res.status(400).json({ 
+          success: false, 
+          error: 'Invalid status value' 
+        });
+      }
+  
+      const updatedPayment = await Payment.findByIdAndUpdate(
+        id,
+        { status },
+        { new: true }
+      );
+  
+      if (!updatedPayment) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'Payment not found' 
+        });
+      }
+  
+      res.json({ 
+        success: true, 
+        payment: updatedPayment 
+      });
+    } catch (error) {
+      console.error('Error updating payment status:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to update payment status' 
+      });
+    }
+  };
+  
+    // Delete payment
+  export const deletePayment = async (req, res) => {
+    try {
+      const { id } = req.params;
+  
+      const deletedPayment = await Payment.findByIdAndDelete(id);
+  
+      if (!deletedPayment) {
+        return res.status(404).json({ 
+          success: false, 
+          error: 'Payment not found' 
+        });
+      }
+  
+      res.json({ 
+        success: true, 
+        message: 'Payment deleted successfully' 
+      });
+    } catch (error) {
+      console.error('Error deleting payment:', error);
+      res.status(500).json({ 
+        success: false, 
+        error: 'Failed to delete payment' 
+      });
     }
   };
 

@@ -22,7 +22,7 @@ import AddDoctor from './pages/Admin/AddDoctor';
 import DoctorsList from './pages/Admin/DoctorsList';
 import ResetPassword from './pages/ResetPassword';
 import Doctordashbord from './pages/Doctor/Doctordashbord';
-
+import AllEarnings from './pages/Admin/AllEarnings';
 import DoctorAppointment from './pages/Doctor/DoctorAppointment';
 import Doctorprofile from './pages/Doctor/Doctorprofile';
 import PatientList from './pages/Admin/PatientList';
@@ -30,6 +30,8 @@ import AppointmentConfirmation from './pages/payment/AppointmentConfirmation';
 import PaymentSuccess from './pages/payment/PaymentSuccess';
 import PaymentCancel from './pages/payment/PaymentCancel';
 import Chatbot from './pages/Chatbot';
+import AllPaymentsAdmin from './pages/Admin/AllPayments';
+import AllPaymentsDoctor from './pages/Doctor/AllPayments';
 
 const App = () => {
   const location = useLocation();
@@ -40,12 +42,10 @@ const App = () => {
   return (
     <div className={!isAdminRoute && !isDoctorRoute && !isChatbot ? 'mx-4 sm:mx-[10%]' : ''}>
       <ToastContainer position="top-right" autoClose={2000} />
-
-      {/* Show Navbar only if not admin, doctor, or chatbot route */}
+  
       {!isAdminRoute && !isDoctorRoute && !isChatbot && <Navbar />}
-
-      {/* Admin Routes */}
-      {isAdminRoute && (
+  
+      {isAdminRoute ? (
         <div>
           <Navadmin />
           <div className='flex items-start'>
@@ -55,17 +55,16 @@ const App = () => {
                 <Route path='/admin' element={<Admindashbord />} />
                 <Route path='/admin/dashbord' element={<Dasgbord />} />
                 <Route path='/admin/all-appointment' element={<AllAppointment />} />
+                <Route path='/admin/all-earnings' element={<AllEarnings />} />
                 <Route path='/admin/addDoctor' element={<AddDoctor />} />
                 <Route path='/admin/DoctorsList' element={<DoctorsList />} />
                 <Route path='/admin/PatientList' element={<PatientList />} />
+                <Route path='/admin/payments' element={<AllPaymentsAdmin />} />
               </Routes>
             </div>
           </div>
         </div>
-      )}
-
-      {/* Doctor Routes */}
-      {isDoctorRoute && (
+      ) : isDoctorRoute ? (
         <div>
           <Navadmin />
           <div className='flex items-start'>
@@ -75,14 +74,12 @@ const App = () => {
                 <Route path='/doctordashed' element={<Doctordashbord />} />
                 <Route path='/doctordashed-appointment' element={<DoctorAppointment />} />
                 <Route path='/doctordashed-profile' element={<Doctorprofile />} />
+                <Route path='/doctordashed-payments' element={<AllPaymentsDoctor />} />
               </Routes>
             </div>
           </div>
         </div>
-      )}
-
-      {/* Chatbot Route - Separate Page */}
-      {isChatbot ? (
+      ) : isChatbot ? (
         <Routes>
           <Route path='/Chatbot' element={<Chatbot />} />
         </Routes>
@@ -99,19 +96,17 @@ const App = () => {
           <Route path='/my-appointments' element={<MyApointment />} />
           <Route path='/appointment/:docId' element={<Appointment />} />
           <Route path='/reset-password' element={<ResetPassword />} />
-          {/* Fallback route */}
-          <Route path='*' element={<Home />} />
-          <Route path='/appointment-confirm' element={<AppointmentConfirmation />} />
+          <Route path='/appointment-confirmation/:appointmentId' element={<AppointmentConfirmation />} />
           <Route path='/payment-success' element={<PaymentSuccess />} />
           <Route path='/payment-cancel' element={<PaymentCancel />} />
-        
+          <Route path='*' element={<Home />} />
         </Routes>
       )}
-
-      {/* Show footer only if it's not admin, doctor, or chatbot route */}
+  
       {!isAdminRoute && !isDoctorRoute && !isChatbot && <Fotter />}
     </div>
   );
+  
 };
 
 

@@ -17,6 +17,7 @@ const AppContextProvider = (props) => {
    const[dashData,setDashdata]=useState(false)
    const [profileDta,setProfileData]=useState(false)
   const [patient,setpatints]=useState([])
+  const [Payments, setPayments] = useState([]);
   const currencysymbol = '$';
 
 //chatapp
@@ -61,6 +62,21 @@ const AppContextProvider = (props) => {
       setuserdata(false);
       setIslogin(false);
       console.error("Error fetching user:", error.message);
+    }
+  };
+
+  const getAllPayments = async () => {
+    try {
+      const { data } = await axios.get(`${backendUrl}/api/payments`, {
+        withCredentials: true
+      });
+      if (data.success) {
+        setPayments(data.data);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
   };
 
@@ -333,6 +349,8 @@ const AppContextProvider = (props) => {
     loading, // Added loading to context value
     setavailable,
     available,
+    Payments,
+    getAllPayments,
     dashData,getdahdata,
     getdoctorprofiledata,profileDta,setProfileData,
     setpatints,patient,geallpatints,deletePatient,deletedoctor,

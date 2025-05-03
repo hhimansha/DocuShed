@@ -15,7 +15,7 @@ const Main = () => {
   return (
     <div className='main'>
       <div className="nav">
-        <p onClick={()=>navigator('/')}> PreScripto</p>
+        <p onClick={()=>navigator('/')}> Docushed</p>
         <img src={userdata?.image ? userdata.image : assets.upload_area} alt="" />
       </div>
       <div className="main-containe">
@@ -27,20 +27,20 @@ const Main = () => {
             <p>How can I help you today?</p>
           </div>
           <div className="cards">
-            <div className="card" onClick={() => handleCardClick("dummy hdbsdbdj sdjsdb")}>
-              <p>dummy hdbsdbdj sdjsdb</p>
+            <div className="card" onClick={() => handleCardClick("Who are the available doctors?")}>
+              <p>Who are the available doctors?</p>
               <img src={assets.compass_icon} alt="" />
             </div>
-            <div className="card" onClick={() => handleCardClick("dummy hdbsdbdj sdjsdb")}>
-              <p>dummy hdbsdbdj sdjsdb</p>
+            <div className="card" onClick={() => handleCardClick("What are the common symptoms of diabetes?")}>
+              <p>What are the common symptoms of diabetes?</p>
               <img src={assets.bulb_icon} alt="" />
             </div>
-            <div className="card" onClick={() => handleCardClick("dummy hdbsdbdj sdjsdb")}>
-              <p>dummy hdbsdbdj sdjsdb</p>
+            <div className="card" onClick={() => handleCardClick("Do you have any available slots for today?")}>
+              <p>Do you have any available slots for today?</p>
               <img src={assets.message_icon} alt="" />
             </div>
-            <div className="card" onClick={() => handleCardClick("dummy hdbsdbdj sdjsdb")}>
-              <p>dummy hdbsdbdj sdjsdb</p>
+            <div className="card" onClick={() => handleCardClick("Is Dr. Zoe Kelly available for an appointment?")}>
+              <p>Is Dr. Zoe Kelly available for an appointment?</p>
               <img src={assets.code_icon} alt="" />
             </div>
           </div>
@@ -77,7 +77,7 @@ const Main = () => {
             </div>
           </div>
           <p className="bottum-info">
-            PreScripto may display inaccurate info, including about people, so double-check its responses. Your privacy and PreScripto Apps
+          Docushed may display inaccurate info, including about people, so double-check its responses. Your privacy and Docushed Apps
           </p>
         </div>
       </div>

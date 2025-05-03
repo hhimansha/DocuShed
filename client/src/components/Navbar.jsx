@@ -62,13 +62,13 @@ const Navbar = () => {
                 >
                     <li className='py-1'>Contact</li>
                 </NavLink>
-                {userdata?<NavLink
+                {/* {userdata?<NavLink
                     to='/Chatbot'
                     className={({ isActive }) => isActive ? 'border-b-2 border-blue-500' : ''}
                 >
                     <li className='py-1'>ASK AI</li>
                 </NavLink>
-                :null}
+                :null} */}
                 
             </ul>
 
@@ -89,7 +89,7 @@ const Navbar = () => {
                     <button
                         onClick={() => navigate('/login')}
                         className="bg-primary text-white px-8 py-3 rounded-full font-light hidden md:block">
-                        Create Account
+                        Log In
                     </button>
                 )}
             </div>

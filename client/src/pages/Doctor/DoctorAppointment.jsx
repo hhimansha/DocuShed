@@ -61,7 +61,7 @@ const DoctorAppointments = () => {
           {/* Payment */}
           <div>
             <p className='text-xs inline border border-primary px-2 rounded-full'>
-              {item.payment ? 'Online' : 'CASH'}
+              {item.payment}
             </p>
           </div>
   
