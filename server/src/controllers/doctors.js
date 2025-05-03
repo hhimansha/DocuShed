@@ -107,7 +107,7 @@ const appointmentComplete = async (req, res) => {
     appointment.isCompleted = true;
     appointment.status = "Approved";
 
-    // Calculate start/end times if not set
+    // Calculate start/end times
     const [day, month, year] = appointment.slotDate.split("_");
     const [hour, minute] = appointment.slotTime.split(":");
     const startTime = new Date(`${year}-${month.padStart(2, "0")}-${day.padStart(2, "0")}T${hour}:${minute}:00`);
@@ -122,6 +122,46 @@ const appointmentComplete = async (req, res) => {
 
     // Generate PDF
     const doc = new PDFDocument();
+    let buffers = [];
+
+    doc.on('data', buffers.push.bind(buffers));
+    doc.on('end', async () => {
+      const pdfBuffer = Buffer.concat(buffers);
+
+      // Send email
+      const transporter = nodemailer.createTransport({
+        service: "gmail",
+        auth: {
+          user: process.env.EMAIL_USER,
+          pass: process.env.EMAIL_PASS,
+        },
+      });
+
+      const mailOptions = {
+        from: `"DocuSched" <${process.env.EMAIL_USER}>`,
+        to: [appointment.doctor?.email, appointment.patient?.email].filter(Boolean),
+        subject: "Your Appointment is Confirmed with Google Meet",
+        html: `
+          <h3>Appointment Confirmed</h3>
+          <p><b>Doctor:</b> Dr. ${appointment.doctor.name}</p>
+          <p><b>Date:</b> ${startTime.toLocaleString()}</p>
+          <p><b>Google Meet Link:</b> <a href="${meetLink}">${meetLink}</a></p>
+        `,
+        attachments: [{
+          filename: "appointment.pdf",
+          content: pdfBuffer,
+          contentType: "application/pdf",
+        }],
+      };
+
+      await transporter.sendMail(mailOptions);
+
+      // Return PDF to frontend
+      res.setHeader("Content-Type", "application/pdf");
+      res.setHeader("Content-Disposition", `attachment; filename=appointment_${appointment._id}.pdf`);
+      res.send(pdfBuffer);
+    });
+
     doc.fontSize(16).text("DocuSched Appointment Confirmation", { align: "center" });
     doc.moveDown();
     doc.text(`Doctor: Dr. ${appointment.doctor.name}`);
@@ -129,41 +169,6 @@ const appointmentComplete = async (req, res) => {
     doc.text(`Date & Time: ${startTime.toLocaleString()}`);
     doc.text(`Google Meet: ${meetLink}`);
     doc.end();
-    const pdfBuffer = await getStream(doc);
-
-
-    // Send email to both doctor and patient
-    const transporter = nodemailer.createTransport({
-      service: "gmail",
-      auth: {
-        user: process.env.EMAIL_USER,
-        pass: process.env.EMAIL_PASS,
-      },
-    });
-
-    const mailOptions = {
-      from: `"DocuSched" <${process.env.EMAIL_USER}>`,
-      to: [appointment.doctor?.email, appointment.patient?.email].filter(Boolean),
-      subject: "Your Appointment is Confirmed with Google Meet",
-      html: `
-        <h3>Appointment Confirmed</h3>
-        <p><b>Doctor:</b> Dr. ${appointment.doctor.name}</p>
-        <p><b>Date:</b> ${startTime.toLocaleString()}</p>
-        <p><b>Google Meet Link:</b> <a href="${meetLink}">${meetLink}</a></p>
-      `,
-      attachments: [{
-        filename: "appointment.pdf",
-        content: pdfBuffer,
-        contentType: "application/pdf",
-      }],
-    };
-
-    await transporter.sendMail(mailOptions);
-
-    // ✅ Send PDF buffer back to frontend
-    res.setHeader("Content-Type", "application/pdf");
-    res.setHeader("Content-Disposition", `attachment; filename=appointment_${appointment._id}.pdf`);
-    res.send(pdfBuffer);
 
   } catch (error) {
     console.error("Error in appointmentComplete:", error);
