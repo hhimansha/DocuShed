@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Routes, useLocation } from 'react-router-dom';
+import { Route, Router, Routes, useLocation } from 'react-router-dom';
 import { ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
@@ -27,6 +27,7 @@ import DoctorAppointment from './pages/Doctor/DoctorAppointment';
 import Doctorprofile from './pages/Doctor/Doctorprofile';
 import PatientList from './pages/Admin/PatientList';
 import Chatbot from './pages/Chatbot';
+import Emailverify from './pages/Emailverify';
 
 const App = () => {
   const location = useLocation();
@@ -96,6 +97,7 @@ const App = () => {
           <Route path='/my-appointments' element={<MyApointment />} />
           <Route path='/appointment/:docId' element={<Appointment />} />
           <Route path='/reset-password' element={<ResetPassword />} />
+          <Route path='/verify-otp' element ={<Emailverify/>}/>
         
         </Routes>
       )}

@@ -14,91 +14,89 @@ const Login = () => {
   const [Email, setEmail] = useState('');
   const [Name, setName] = useState('');
   const [Password, setPassword] = useState('');
-  const [otpsubmit ,setotpsubmit]=useState(false)
-
+  const [otpsubmit, setotpsubmit] = useState(false);
 
   const onSubmitHandler = async (event) => {
     event.preventDefault();
 
     try {
-        if (state === 'Login') {
-            const { data } = await axios.post('http://localhost:5000/api/auth/login', {
-                email: Email,
-                password: Password
-            }, {
-                withCredentials: true
-            });
-
-            console.log(data); // Debugging
-
-            if (data.status === 'success') {
-                const { isAdmin, isStaff } = data;
-
-                // Call once
-                await getuser();
-                setIslogin(true);
-
-                // Role-based redirect with SweetAlert2
-                if (isAdmin) {
-                    Swal.fire({
-                        title: 'Admin Login Success!',
-                        text: 'Redirecting to Admin Dashboard...',
-                        icon: 'success',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.href = '/admin/dashbord';
-                    });
-
-                } else if (isStaff) {
-                    Swal.fire({
-                        title: 'Doctor Login Success!',
-                        text: 'Redirecting to Doctor Dashboard...',
-                        icon: 'success',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.href = '/doctordashed';
-                    });
-
-                } else {
-                    Swal.fire({
-                        title: 'Login Successful!',
-                        text: 'Redirecting to Home...',
-                        icon: 'success',
-                        confirmButtonColor: '#3085d6',
-                        confirmButtonText: 'OK'
-                    }).then(() => {
-                        window.location.href = '/';
-                    });
-                }
-            }
-
-        } else {
-            // Sign up logic with Toast
-            const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
-                name: Name,
-                email: Email,
-                password: Password
-            });
-
-            if (data.success === true) {
-                toast.success("Account Created! Please Login");
-                setState('Login');
-            }
-        }
-    } catch (error) {
-        Swal.fire({
-            title: 'Error!',
-            text: error.response?.data?.message || "Something went wrong!",
-            icon: 'error',
-            confirmButtonColor: '#d33',
-            confirmButtonText: 'Try Again'
+      if (state === 'Login') {
+        const { data } = await axios.post('http://localhost:5000/api/auth/login', {
+          email: Email,
+          password: Password,
+        }, {
+          withCredentials: true
         });
+
+        console.log(data); // Debugging
+
+        if (data.status === 'success') {
+          const { isAdmin, isStaff } = data;
+
+          // Call once
+          await getuser();
+          setIslogin(true);
+
+          // Role-based redirect with SweetAlert2
+          if (isAdmin) {
+            Swal.fire({
+              title: 'Admin Login Success!',
+              text: 'Redirecting to Admin Dashboard...',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+              confirmButtonText: 'OK'
+            }).then(() => {
+              window.location.href = '/admin/dashbord';
+            });
+
+          } else if (isStaff) {
+            Swal.fire({
+              title: 'Doctor Login Success!',
+              text: 'Redirecting to Doctor Dashboard...',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+              confirmButtonText: 'OK'
+            }).then(() => {
+              window.location.href = '/doctordashed';
+            });
+
+          } else {
+            Swal.fire({
+              title: 'Login Successful!',
+              text: 'Redirecting to Home...',
+              icon: 'success',
+              confirmButtonColor: '#3085d6',
+              confirmButtonText: 'OK'
+            }).then(() => {
+              window.location.href = '/';
+            });
+          }
+        }
+
+      } else {
+        // Sign up logic with Toast
+        const { data } = await axios.post(`${backendUrl}/api/auth/register`, {
+          name: Name,
+          email,
+          password: Password
+        });
+        Cookies.set('userEmail', email, { expires: 1 });
+        if (data.success === true) {
+          toast.success("Account Created! Please check your email for OTP.");
+          // Navigate to OTP verification page
+          navigate('/verify-otp', { state: { userId: data.userId } });
+        }
+      }
+    } catch (error) {
+      Swal.fire({
+        title: 'Error!',
+        text: error.response?.data?.message || "Something went wrong!",
+        icon: 'error',
+        confirmButtonColor: '#d33',
+        confirmButtonText: 'Try Again'
+      });
     }
-};
-
-
+  };
 
   return (
     <form className="min-h-screen flex items-center justify-center bg-gradient-to-br ">
@@ -146,17 +144,17 @@ const Login = () => {
         </div>
 
         {state === "Login" && (
-      <p
-      className="text-indigo-600 cursor-pointer hover:underline"
-      onClick={() => {
-        navigate('/reset-password');
-        window.location.href = '/reset-password';
-      }}
-    >
-      Forget password
-    </p>
-    
+          <p
+            className="text-indigo-600 cursor-pointer hover:underline"
+            onClick={() => {
+              navigate('/reset-password');
+              window.location.href = '/reset-password';
+            }}
+          >
+            Forgot password?
+          </p>
         )}
+
         <button
           onClick={onSubmitHandler}
           className="bg-indigo-600 text-white w-full py-3 rounded-md text-base mt-4 hover:bg-indigo-700 transition duration-200"
@@ -183,11 +181,6 @@ const Login = () => {
         </p>
       </div>
       <ToastContainer position="top-right" autoClose={2000} />
-
-     
-
-
-
     </form>
   );
 };

@@ -1,6 +1,6 @@
 import express from "express";
 
-import { allDoctors, checktoken, getUserData, login, logout, register, resetpassword, sendResetOtp, updateProfile, userRestPassword, verifyResetOtp,deleteUserAccount, bookAppointment, listAppointment, cancelAppointment } from "../controllers/userController.js";
+import { allDoctors, checktoken, getUserData, login, logout, register, resetpassword, sendResetOtp, updateProfile, userRestPassword, verifyResetOtp,deleteUserAccount, bookAppointment, listAppointment, cancelAppointment, verifyOTPs } from "../controllers/userController.js";
 // import { getUsers } from "../controllers/userController";
 import userAuth from "../Middleware/userAutj.js";
 import upload from "../Middleware/multer.js";
@@ -26,6 +26,7 @@ authrouter.delete('/delete-user',userAuth,deleteUserAccount);
 authrouter.post("/book-appointment", userAuth, bookAppointment)
 authrouter.get("/appointments", userAuth, listAppointment)
 authrouter.post("/cancel-appointment", userAuth, cancelAppointment)
+authrouter.post('/verify-otp', verifyOTPs); // Use userAuth middleware if the user is logged in
 
 
 
